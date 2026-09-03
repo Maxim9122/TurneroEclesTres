@@ -35,6 +35,11 @@ class Usuario extends Authenticatable implements MustVerifyEmail
         return $this->belongsTo(Empresa::class);
     }
 
+    public function profesional(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(Profesional::class);
+    }
+
     public function esSuperAdmin(): bool
     {
         return $this->rol === 'super_admin';
