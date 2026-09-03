@@ -1,15 +1,26 @@
 <?php
 
+use App\Http\Controllers\Publico\EmpresaPublicaController;
+use App\Http\Controllers\Staff\EmpresaBrandingController;
 use App\Http\Controllers\Staff\EmpresaAdminController;
 use App\Http\Controllers\Auth\ClienteAuthController;
 use App\Http\Controllers\Auth\EmpresaRegisterController;
 use App\Http\Controllers\Auth\StaffAuthController;
 use Illuminate\Support\Facades\Route;
 
-// Home público (después será el buscador de empresas por barrio/rubro)
+/*
+|--------------------------------------------------------------------------
+| Rutas Públicas
+|--------------------------------------------------------------------------
+*/
+
+// Home público
 Route::get('/', function () {
     return view('welcome');
 })->name('home');
+
+// Perfil público del negocio / empresa
+Route::get('/negocio/{empresa:slug}', [EmpresaPublicaController::class, 'show'])->name('publico.empresa');
 
 /*
 |--------------------------------------------------------------------------
@@ -23,7 +34,7 @@ Route::prefix('staff')->name('staff.')->group(function () {
 
     Route::get('/registro-empresa', [EmpresaRegisterController::class, 'showRegister'])->name('registro-empresa');
     Route::post('/registro-empresa', [EmpresaRegisterController::class, 'register']);
-
+    
     Route::middleware(['auth:web', 'empresa.activa'])->group(function () {
         Route::middleware(['rol:super_admin'])->group(function () {
             Route::get('/plataforma/dashboard', function () {
@@ -41,6 +52,11 @@ Route::prefix('staff')->name('staff.')->group(function () {
             Route::get('/empresa/dashboard', function () {
                 return view('staff.empresa-dashboard');
             })->name('empresa.dashboard');
+        });
+
+        Route::middleware(['rol:admin'])->group(function () {
+            Route::get('/empresa/branding', [EmpresaBrandingController::class, 'edit'])->name('empresa.branding.edit');
+            Route::post('/empresa/branding', [EmpresaBrandingController::class, 'update'])->name('empresa.branding.update');
         });
     });
 });

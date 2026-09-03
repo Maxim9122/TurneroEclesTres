@@ -50,4 +50,9 @@ class Empresa extends Model
 
         return 'background-color: ' . ($this->color_fondo ?: '#EDE7DD') . ';';
     }
+
+    public function getRouteKeyName(): string
+    {
+        return 'slug';
+    }
 }
