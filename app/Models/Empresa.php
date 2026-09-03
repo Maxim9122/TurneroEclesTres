@@ -33,6 +33,16 @@ class Empresa extends Model
         return $this->hasMany(Usuario::class);
     }
 
+    public function servicios(): HasMany
+    {
+        return $this->hasMany(Servicio::class);
+    }
+
+    public function profesionales(): HasMany
+    {
+        return $this->hasMany(Profesional::class);
+    }
+
     public function direcciones(): MorphMany
     {
         return $this->morphMany(Direccion::class, 'direccionable');
