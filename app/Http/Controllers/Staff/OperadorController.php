@@ -47,7 +47,7 @@ class OperadorController extends Controller
             'activo' => true,
         ]);
 
-        return redirect()->route('staff.operadores.index')
+        return redirect()->route('staff.empresa.operadores.index')
             ->with('status', 'Operador creado correctamente.');
     }
 

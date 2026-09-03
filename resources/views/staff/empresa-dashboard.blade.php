@@ -39,5 +39,9 @@
             class="inline-block border border-mate-borde rounded-md px-4 py-2.5 text-sm font-medium">
             Configurar dirección
         </a>
+        <a href="{{ route('staff.empresa.operadores.index') }}"
+            class="inline-block border border-mate-borde rounded-md px-4 py-2.5 text-sm font-medium">
+            Gestionar operadores
+        </a>
     @endif
 </x-layouts.app>

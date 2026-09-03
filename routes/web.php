@@ -7,6 +7,7 @@ use App\Http\Controllers\Auth\ClienteAuthController;
 use App\Http\Controllers\Auth\EmpresaRegisterController;
 use App\Http\Controllers\Auth\StaffAuthController;
 use App\Http\Controllers\Staff\EmpresaDireccionController;
+use App\Http\Controllers\Staff\OperadorController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -58,6 +59,10 @@ Route::prefix('staff')->name('staff.')->group(function () {
             Route::post('/empresa/branding', [EmpresaBrandingController::class, 'update'])->name('empresa.branding.update');
             Route::get('/empresa/direccion', [EmpresaDireccionController::class, 'edit'])->name('empresa.direccion.edit');
             Route::post('/empresa/direccion', [EmpresaDireccionController::class, 'update'])->name('empresa.direccion.update');
+            Route::get('/empresa/operadores', [OperadorController::class, 'index'])->name('empresa.operadores.index');
+            Route::get('/empresa/operadores/nuevo', [OperadorController::class, 'create'])->name('empresa.operadores.create');
+            Route::post('/empresa/operadores', [OperadorController::class, 'store'])->name('empresa.operadores.store');
+            Route::post('/empresa/operadores/{usuario}/alternar', [OperadorController::class, 'alternarEstado'])->name('empresa.operadores.alternar');
         });
     });
 });
