@@ -1,0 +1,24 @@
+@import "tailwindcss";
+
+@theme {
+  --color-mate-fondo: #EDE7DD;
+  --color-mate-tinta: #2E2B26;
+  --color-mate-salvia: #6B7360;
+  --color-mate-salvia-oscuro: #545A48;
+  --color-mate-arcilla: #A9836C;
+  --color-mate-superficie: #F7F4EE;
+  --color-mate-borde: #DDD5C7;
+
+  --font-display: "Fraunces", ui-serif, serif;
+  --font-body: "Inter", ui-sans-serif, sans-serif;
+}
+
+body {
+  background-color: var(--color-mate-fondo);
+  color: var(--color-mate-tinta);
+  font-family: var(--font-body);
+}
+
+h1, h2, h3, .font-display {
+  font-family: var(--font-display);
+}
