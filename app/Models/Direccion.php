@@ -10,8 +10,10 @@ class Direccion extends Model
 {
     use HasFactory;
 
+    protected $table = 'direcciones';
+
     protected $fillable = [
-        'barrio', 'calle', 'altura', 'lat', 'lng',
+        'ciudad', 'barrio', 'calle', 'altura', 'lat', 'lng',
     ];
 
     public function direccionable(): MorphTo

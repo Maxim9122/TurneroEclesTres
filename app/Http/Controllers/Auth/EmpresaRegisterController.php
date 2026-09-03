@@ -24,6 +24,10 @@ class EmpresaRegisterController extends Controller
             'empresa_nombre' => ['required', 'string', 'max:255'],
             'rubro' => ['required', 'in:peluqueria,barberia,estetica,unas'],
             'telefono' => ['nullable', 'string', 'max:30'],
+            'ciudad' => ['required', 'string', 'max:120'],
+            'barrio' => ['required', 'string', 'max:120'],
+            'calle' => ['required', 'string', 'max:150'],
+            'altura' => ['nullable', 'string', 'max:20'],
             'admin_nombre' => ['required', 'string', 'max:255'],
             'admin_email' => ['required', 'email', 'unique:usuarios,email'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
@@ -35,6 +39,13 @@ class EmpresaRegisterController extends Controller
                 'rubro' => $data['rubro'],
                 'telefono' => $data['telefono'] ?? null,
                 'estado' => 'pendiente',
+            ]);
+
+            $empresa->direcciones()->create([
+                'ciudad' => $data['ciudad'],
+                'barrio' => $data['barrio'],
+                'calle' => $data['calle'],
+                'altura' => $data['altura'] ?? null,
             ]);
 
             return Usuario::create([

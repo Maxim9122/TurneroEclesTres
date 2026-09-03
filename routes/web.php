@@ -6,6 +6,7 @@ use App\Http\Controllers\Staff\EmpresaAdminController;
 use App\Http\Controllers\Auth\ClienteAuthController;
 use App\Http\Controllers\Auth\EmpresaRegisterController;
 use App\Http\Controllers\Auth\StaffAuthController;
+use App\Http\Controllers\Staff\EmpresaDireccionController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -15,9 +16,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 // Home público
-Route::get('/', function () {
-    return view('welcome');
-})->name('home');
+Route::get('/', [\App\Http\Controllers\Publico\BuscadorController::class, 'index'])->name('home');
 
 // Perfil público del negocio / empresa
 Route::get('/negocio/{empresa:slug}', [EmpresaPublicaController::class, 'show'])->name('publico.empresa');
@@ -57,6 +56,8 @@ Route::prefix('staff')->name('staff.')->group(function () {
         Route::middleware(['rol:admin'])->group(function () {
             Route::get('/empresa/branding', [EmpresaBrandingController::class, 'edit'])->name('empresa.branding.edit');
             Route::post('/empresa/branding', [EmpresaBrandingController::class, 'update'])->name('empresa.branding.update');
+            Route::get('/empresa/direccion', [EmpresaDireccionController::class, 'edit'])->name('empresa.direccion.edit');
+            Route::post('/empresa/direccion', [EmpresaDireccionController::class, 'update'])->name('empresa.direccion.update');
         });
     });
 });

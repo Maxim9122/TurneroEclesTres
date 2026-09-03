@@ -39,6 +39,31 @@
                 class="w-full rounded-md border border-mate-borde bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-mate-salvia">
         </div>
 
+        <div>
+            <label class="block text-sm mb-1">Ciudad</label>
+            <input type="text" name="ciudad" required value="{{ old('ciudad') }}"
+                class="w-full rounded-md border border-mate-borde bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-mate-salvia">
+        </div>
+
+        <div>
+            <label class="block text-sm mb-1">Barrio</label>
+            <input type="text" name="barrio" required value="{{ old('barrio') }}"
+                class="w-full rounded-md border border-mate-borde bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-mate-salvia">
+        </div>
+
+        <div class="grid grid-cols-3 gap-3">
+            <div class="col-span-2">
+                <label class="block text-sm mb-1">Calle</label>
+                <input type="text" name="calle" required value="{{ old('calle') }}"
+                    class="w-full rounded-md border border-mate-borde bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-mate-salvia">
+            </div>
+            <div>
+                <label class="block text-sm mb-1">Altura</label>
+                <input type="text" name="altura" value="{{ old('altura') }}"
+                    class="w-full rounded-md border border-mate-borde bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-mate-salvia">
+            </div>
+        </div>
+
         <hr class="border-mate-borde my-2">
 
         <div>

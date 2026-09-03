@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Str;
+use App\Models\Direccion;
 
 class Empresa extends Model
 {
@@ -54,5 +55,10 @@ class Empresa extends Model
     public function getRouteKeyName(): string
     {
         return 'slug';
+    }
+
+    public function direccionPrincipal(): ?Direccion
+    {
+        return $this->direcciones()->first();
     }
 }
