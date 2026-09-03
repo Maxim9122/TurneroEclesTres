@@ -12,6 +12,8 @@ class Profesional extends Model
 {
     use HasFactory;
 
+    protected $table = 'profesionales';
+
     protected $fillable = [
         'empresa_id', 'usuario_id', 'nombre', 'foto_path', 'activo',
     ];
@@ -34,6 +36,22 @@ class Profesional extends Model
     public function horarios(): HasMany
     {
         return $this->hasMany(ProfesionalHorario::class);
+    }
+
+    /**
+     * Si el profesional tiene su propio horario cargado, se usa ese.
+     * Si no tiene ninguno, hereda el horario general de la empresa.
+     */
+    public function horariosEfectivos()
+    {
+        $propios = $this->horarios;
+
+        return $propios->isNotEmpty() ? $propios : $this->empresa->horarios;
+    }
+
+    public function usaHorarioGeneral(): bool
+    {
+        return $this->horarios->isEmpty();
     }
 
     public function turnos(): HasMany

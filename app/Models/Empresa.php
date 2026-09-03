@@ -43,6 +43,11 @@ class Empresa extends Model
         return $this->hasMany(Profesional::class);
     }
 
+    public function horarios(): HasMany
+    {
+        return $this->hasMany(EmpresaHorario::class);
+    }
+
     public function direcciones(): MorphMany
     {
         return $this->morphMany(Direccion::class, 'direccionable');

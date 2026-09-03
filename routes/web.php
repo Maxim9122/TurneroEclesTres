@@ -9,6 +9,9 @@ use App\Http\Controllers\Auth\StaffAuthController;
 use App\Http\Controllers\Staff\EmpresaDireccionController;
 use App\Http\Controllers\Staff\OperadorController;
 use App\Http\Controllers\Staff\ServicioController;
+use App\Http\Controllers\Staff\ProfesionalController;
+use App\Http\Controllers\Staff\ProfesionalHorarioController;
+use App\Http\Controllers\Staff\EmpresaHorarioController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -70,6 +73,21 @@ Route::prefix('staff')->name('staff.')->group(function () {
             Route::get('/empresa/servicios/{servicio}/editar', [ServicioController::class, 'edit'])->name('empresa.servicios.edit');
             Route::put('/empresa/servicios/{servicio}', [ServicioController::class, 'update'])->name('empresa.servicios.update');
             Route::post('/empresa/servicios/{servicio}/alternar', [ServicioController::class, 'alternarEstado'])->name('empresa.servicios.alternar');
+            Route::get('/empresa/profesionales', [ProfesionalController::class, 'index'])->name('empresa.profesionales.index');
+            Route::get('/empresa/profesionales/nuevo', [ProfesionalController::class, 'create'])->name('empresa.profesionales.create');
+            Route::post('/empresa/profesionales', [ProfesionalController::class, 'store'])->name('empresa.profesionales.store');
+            Route::get('/empresa/profesionales/{profesional}/editar', [ProfesionalController::class, 'edit'])->name('empresa.profesionales.edit');
+            Route::put('/empresa/profesionales/{profesional}', [ProfesionalController::class, 'update'])->name('empresa.profesionales.update');
+            Route::post('/empresa/profesionales/{profesional}/alternar', [ProfesionalController::class, 'alternarEstado'])->name('empresa.profesionales.alternar');
+            Route::get('/empresa/horario-general', [EmpresaHorarioController::class, 'edit'])->name('empresa.horario-general.edit');
+            Route::post('/empresa/horario-general', [EmpresaHorarioController::class, 'store'])->name('empresa.horario-general.store');
+            Route::delete('/empresa/horario-general/{horario}', [EmpresaHorarioController::class, 'destroy'])->name('empresa.horario-general.destroy');
+        });
+
+        Route::middleware(['rol:admin,operador'])->group(function () {
+            Route::get('/empresa/profesionales/{profesional}/horarios', [ProfesionalHorarioController::class, 'edit'])->name('empresa.profesionales.horarios.edit');
+            Route::post('/empresa/profesionales/{profesional}/horarios', [ProfesionalHorarioController::class, 'store'])->name('empresa.profesionales.horarios.store');
+            Route::delete('/empresa/profesionales/{profesional}/horarios/{horario}', [ProfesionalHorarioController::class, 'destroy'])->name('empresa.profesionales.horarios.destroy');
         });
     });
 });
