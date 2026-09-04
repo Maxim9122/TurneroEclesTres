@@ -13,6 +13,7 @@ use App\Http\Controllers\Staff\ProfesionalController;
 use App\Http\Controllers\Staff\ProfesionalHorarioController;
 use App\Http\Controllers\Staff\EmpresaHorarioController;
 use App\Http\Controllers\Publico\ReservaController;
+use App\Http\Controllers\Staff\TurnoController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -60,6 +61,10 @@ Route::prefix('staff')->name('staff.')->group(function () {
             Route::get('/empresa/dashboard', function () {
                 return view('staff.empresa-dashboard');
             })->name('empresa.dashboard');
+            Route::get('/empresa/turnos', [TurnoController::class, 'index'])->name('empresa.turnos.index');
+            Route::get('/empresa/turnos/{turno}/editar', [TurnoController::class, 'edit'])->name('empresa.turnos.edit');
+            Route::put('/empresa/turnos/{turno}', [TurnoController::class, 'update'])->name('empresa.turnos.update');
+            Route::post('/empresa/turnos/{turno}/estado', [TurnoController::class, 'cambiarEstado'])->name('empresa.turnos.estado');
         });
 
         Route::middleware(['rol:admin'])->group(function () {

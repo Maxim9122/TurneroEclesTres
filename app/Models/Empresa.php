@@ -43,6 +43,11 @@ class Empresa extends Model
         return $this->hasMany(Profesional::class);
     }
 
+    public function turnos(): HasMany
+    {
+        return $this->hasMany(Turno::class);
+    }
+
     public function horarios(): HasMany
     {
         return $this->hasMany(EmpresaHorario::class);
