@@ -6,7 +6,7 @@
     <title>{{ $empresa->nombre }} - EclesTres</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    @vite(['resources/css/app.css'])
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="min-h-screen bg-mate-fondo font-body">
 
@@ -21,21 +21,87 @@
         </div>
     </div>
 
-    <main class="max-w-md mx-auto px-4 py-6">
+    <main class="max-w-md mx-auto px-4 py-6" x-data="{
+        servicioIds: [],
+        profesionalId: '',
+        toggleServicio(id) {
+            this.servicioIds.includes(id)
+                ? this.servicioIds = this.servicioIds.filter(s => s !== id)
+                : this.servicioIds.push(id);
+        }
+    }">
         @if ($empresa->descripcion)
             <p class="text-sm text-mate-tinta/80 mb-6">{{ $empresa->descripcion }}</p>
         @endif
 
-        <div class="grid grid-cols-2 gap-3">
-            <a href="#"
-                class="text-center bg-mate-salvia hover:bg-mate-salvia-oscuro text-white rounded-md py-3 text-sm font-medium">
-                Sacar turno
-            </a>
-            <a href="#"
-                class="text-center border border-mate-borde rounded-md py-3 text-sm font-medium">
-                Ver productos
-            </a>
-        </div>
+        {{-- Servicios --}}
+        <section class="mb-8">
+            <h2 class="font-display text-lg mb-3">Servicios</h2>
+
+            @if ($servicios->isEmpty())
+                <p class="text-sm text-mate-tinta/60">Este negocio todavía no cargó servicios.</p>
+            @else
+                <div class="space-y-2">
+                    @foreach ($servicios as $servicio)
+                        <label class="flex items-center justify-between bg-mate-superficie border border-mate-borde rounded-md px-3 py-2.5 cursor-pointer"
+                            :class="servicioIds.includes({{ $servicio->id }}) ? 'ring-2 ring-mate-salvia' : ''">
+                            <span class="flex items-center gap-2 text-sm">
+                                <input type="checkbox" class="rounded border-mate-borde"
+                                    @change="toggleServicio({{ $servicio->id }})">
+                                {{ $servicio->nombre }}
+                                <span class="text-xs text-mate-tinta/50">({{ $servicio->duracion_minutos }} min)</span>
+                            </span>
+                            <span class="text-sm font-medium">${{ number_format($servicio->precio, 2, ',', '.') }}</span>
+                        </label>
+                    @endforeach
+                </div>
+            @endif
+        </section>
+
+        {{-- Profesionales --}}
+        <section class="mb-8">
+            <h2 class="font-display text-lg mb-3">¿Con quién te querés atender?</h2>
+
+            <div class="grid grid-cols-3 gap-3">
+                <button type="button" @click="profesionalId = ''"
+                    class="flex flex-col items-center gap-1 p-2 rounded-md border"
+                    :class="profesionalId === '' ? 'border-mate-salvia bg-mate-superficie' : 'border-mate-borde'">
+                    <div class="w-12 h-12 rounded-full bg-mate-borde flex items-center justify-center text-xs text-mate-tinta/60">
+                        Sin<br>pref.
+                    </div>
+                    <span class="text-xs text-center">Sin preferencia</span>
+                </button>
+
+                @foreach ($profesionales as $profesional)
+                    <button type="button" @click="profesionalId = '{{ $profesional->id }}'"
+                        class="flex flex-col items-center gap-1 p-2 rounded-md border"
+                        :class="profesionalId === '{{ $profesional->id }}' ? 'border-mate-salvia bg-mate-superficie' : 'border-mate-borde'">
+                        @if ($profesional->foto_path)
+                            <img src="{{ asset('storage/' . $profesional->foto_path) }}" class="w-12 h-12 rounded-full object-cover">
+                        @else
+                            <div class="w-12 h-12 rounded-full bg-mate-borde"></div>
+                        @endif
+                        <span class="text-xs text-center">{{ $profesional->nombre }}</span>
+                    </button>
+                @endforeach
+            </div>
+        </section>
+
+        {{-- Resumen y continuar --}}
+        <div class="sticky bottom-4">
+        <button type="button"
+            x-show="servicioIds.length > 0"
+            x-cloak
+            @click="
+                const params = new URLSearchParams();
+                servicioIds.forEach(id => params.append('servicios[]', id));
+                if (profesionalId) params.append('profesional', profesionalId);
+                window.location.href = '{{ route('publico.reserva.iniciar', $empresa) }}?' + params.toString();
+            "
+            class="w-full bg-mate-salvia hover:bg-mate-salvia-oscuro text-white rounded-md py-3 text-sm font-medium shadow-lg">
+            Continuar reserva
+        </button>
+    </div>
 
         <p class="text-xs text-mate-tinta/50 text-center mt-8">
             <a href="{{ route('home') }}" class="underline">EclesTres</a>

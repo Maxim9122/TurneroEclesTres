@@ -14,6 +14,9 @@ class EmpresaPublicaController extends Controller
             abort(404);
         }
 
-        return view('publico.empresa', compact('empresa'));
+        $servicios = $empresa->servicios()->where('activo', true)->orderBy('nombre')->get();
+        $profesionales = $empresa->profesionales()->where('activo', true)->orderBy('nombre')->get();
+
+        return view('publico.empresa', compact('empresa', 'servicios', 'profesionales'));
     }
 }

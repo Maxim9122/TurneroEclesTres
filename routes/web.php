@@ -12,6 +12,7 @@ use App\Http\Controllers\Staff\ServicioController;
 use App\Http\Controllers\Staff\ProfesionalController;
 use App\Http\Controllers\Staff\ProfesionalHorarioController;
 use App\Http\Controllers\Staff\EmpresaHorarioController;
+use App\Http\Controllers\Publico\ReservaController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -25,6 +26,9 @@ Route::get('/', [\App\Http\Controllers\Publico\BuscadorController::class, 'index
 
 // Perfil público del negocio / empresa
 Route::get('/negocio/{empresa:slug}', [EmpresaPublicaController::class, 'show'])->name('publico.empresa');
+Route::get('/negocio/{empresa:slug}/reservar', [ReservaController::class, 'iniciar'])->name('publico.reserva.iniciar');
+Route::get('/negocio/{empresa:slug}/horarios-disponibles', [ReservaController::class, 'horariosDisponibles'])->name('publico.reserva.horarios');
+Route::post('/negocio/{empresa:slug}/reservar', [ReservaController::class, 'confirmar'])->name('publico.reserva.confirmar');
 
 /*
 |--------------------------------------------------------------------------
@@ -108,5 +112,6 @@ Route::prefix('cuenta')->name('cliente.')->group(function () {
         Route::get('/', function () {
             return view('cliente.home');
         })->name('home');
+        Route::get('/turnos/{turno}', [ReservaController::class, 'confirmado'])->name('turnos.confirmado');
     });
 });
