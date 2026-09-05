@@ -29,4 +29,7 @@
     <p class="text-sm text-center text-mate-tinta/70 mt-6">
         ¿No tenés cuenta? <a href="{{ route('cliente.register') }}" class="text-mate-salvia font-medium">Registrate</a>
     </p>
+    <p class="text-sm text-right">
+        <a href="{{ route('cliente.password.request') }}" class="text-mate-salvia">¿Olvidaste tu contraseña?</a>
+    </p>
 </x-layouts.guest>

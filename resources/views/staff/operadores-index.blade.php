@@ -35,6 +35,17 @@
                             {{ $operador->activo ? 'Desactivar' : 'Activar' }}
                         </button>
                     </form>
+                    <details class="text-xs">
+                        <summary class="underline text-mate-tinta/70 cursor-pointer">Cambiar contraseña</summary>
+                        <form method="POST" action="{{ route('staff.empresa.operadores.password', $operador) }}" class="mt-2 space-y-2">
+                            @csrf
+                            <input type="password" name="password" placeholder="Nueva contraseña" required
+                                class="w-full rounded-md border border-mate-borde bg-white px-2 py-1.5 text-xs">
+                            <input type="password" name="password_confirmation" placeholder="Repetir contraseña" required
+                                class="w-full rounded-md border border-mate-borde bg-white px-2 py-1.5 text-xs">
+                            <button type="submit" class="text-xs bg-mate-salvia text-white rounded-md px-3 py-1.5">Guardar</button>
+                        </form>
+                    </details>
                 </div>
             </div>
         @empty

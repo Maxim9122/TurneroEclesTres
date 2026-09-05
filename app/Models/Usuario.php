@@ -2,15 +2,18 @@
 
 namespace App\Models;
 
+use Illuminate\Auth\Passwords\CanResetPassword;
+use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-class Usuario extends Authenticatable implements MustVerifyEmail
+class Usuario extends Authenticatable implements MustVerifyEmail, CanResetPasswordContract
 {
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, CanResetPassword;
 
     protected $fillable = [
         'empresa_id', 'nombre', 'email', 'password',
@@ -35,11 +38,6 @@ class Usuario extends Authenticatable implements MustVerifyEmail
         return $this->belongsTo(Empresa::class);
     }
 
-    public function profesional(): \Illuminate\Database\Eloquent\Relations\HasOne
-    {
-        return $this->hasOne(Profesional::class);
-    }
-
     public function esSuperAdmin(): bool
     {
         return $this->rol === 'super_admin';
@@ -53,5 +51,15 @@ class Usuario extends Authenticatable implements MustVerifyEmail
     public function esOperador(): bool
     {
         return $this->rol === 'operador';
+    }
+
+    public function profesional(): HasOne
+    {
+        return $this->hasOne(Profesional::class);
+    }
+    
+    public function sendPasswordResetNotification($token): void
+    {
+        $this->notify(new \App\Notifications\ResetPasswordNotification($token, 'staff.password.reset'));
     }
 }

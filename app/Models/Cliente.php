@@ -2,15 +2,17 @@
 
 namespace App\Models;
 
+use Illuminate\Auth\Passwords\CanResetPassword;
+use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-class Cliente extends Authenticatable implements MustVerifyEmail
+class Cliente extends Authenticatable implements MustVerifyEmail, CanResetPasswordContract
 {
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, CanResetPassword;
 
     protected $fillable = [
         'nombre', 'email', 'password', 'telefono',
@@ -31,5 +33,10 @@ class Cliente extends Authenticatable implements MustVerifyEmail
     public function direcciones(): MorphMany
     {
         return $this->morphMany(Direccion::class, 'direccionable');
+    }
+
+    public function sendPasswordResetNotification($token): void
+    {
+        $this->notify(new \App\Notifications\ResetPasswordNotification($token, 'cliente.password.reset'));
     }
 }

@@ -24,6 +24,9 @@
             <input type="checkbox" name="recordar" class="rounded border-mate-borde">
             Recordarme
         </label>
+        <p class="text-sm text-right">
+            <a href="{{ route('staff.password.request') }}" class="text-mate-salvia">¿Olvidaste tu contraseña?</a>
+        </p>
         <button type="submit"
             class="w-full bg-mate-salvia hover:bg-mate-salvia-oscuro text-white rounded-md py-2.5 text-sm font-medium transition-colors">
             Ingresar

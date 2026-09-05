@@ -14,6 +14,9 @@ use App\Http\Controllers\Staff\ProfesionalHorarioController;
 use App\Http\Controllers\Staff\EmpresaHorarioController;
 use App\Http\Controllers\Publico\ReservaController;
 use App\Http\Controllers\Staff\TurnoController;
+use App\Http\Controllers\Cliente\MisTurnosController;
+use App\Http\Controllers\Auth\ClientePasswordController;
+use App\Http\Controllers\Auth\StaffPasswordController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -37,6 +40,10 @@ Route::post('/negocio/{empresa:slug}/reservar', [ReservaController::class, 'conf
 |--------------------------------------------------------------------------
 */
 Route::prefix('staff')->name('staff.')->group(function () {
+    Route::get('/olvide-password', [StaffPasswordController::class, 'showLinkRequest'])->name('password.request');
+    Route::post('/olvide-password', [StaffPasswordController::class, 'sendLink'])->name('password.email');
+    Route::get('/resetear-password/{token}', [StaffPasswordController::class, 'showReset'])->name('password.reset');
+    Route::post('/resetear-password', [StaffPasswordController::class, 'reset'])->name('password.update');
     Route::get('/login', [StaffAuthController::class, 'showLogin'])->name('login');
     Route::post('/login', [StaffAuthController::class, 'login']);
     Route::post('/logout', [StaffAuthController::class, 'logout'])->name('logout');
@@ -61,6 +68,7 @@ Route::prefix('staff')->name('staff.')->group(function () {
             Route::get('/empresa/dashboard', function () {
                 return view('staff.empresa-dashboard');
             })->name('empresa.dashboard');
+            Route::post('/empresa/operadores/{usuario}/password', [OperadorController::class, 'resetearPassword'])->name('empresa.operadores.password');
             Route::get('/empresa/turnos', [TurnoController::class, 'index'])->name('empresa.turnos.index');
             Route::get('/empresa/turnos/{turno}/editar', [TurnoController::class, 'edit'])->name('empresa.turnos.edit');
             Route::put('/empresa/turnos/{turno}', [TurnoController::class, 'update'])->name('empresa.turnos.update');
@@ -107,6 +115,10 @@ Route::prefix('staff')->name('staff.')->group(function () {
 |--------------------------------------------------------------------------
 */
 Route::prefix('cuenta')->name('cliente.')->group(function () {
+    Route::get('/olvide-password', [ClientePasswordController::class, 'showLinkRequest'])->name('password.request');
+    Route::post('/olvide-password', [ClientePasswordController::class, 'sendLink'])->name('password.email');
+    Route::get('/resetear-password/{token}', [ClientePasswordController::class, 'showReset'])->name('password.reset');
+    Route::post('/resetear-password', [ClientePasswordController::class, 'reset'])->name('password.update');
     Route::get('/login', [ClienteAuthController::class, 'showLogin'])->name('login');
     Route::post('/login', [ClienteAuthController::class, 'login']);
     Route::get('/registro', [ClienteAuthController::class, 'showRegister'])->name('register');
@@ -118,5 +130,7 @@ Route::prefix('cuenta')->name('cliente.')->group(function () {
             return view('cliente.home');
         })->name('home');
         Route::get('/turnos/{turno}', [ReservaController::class, 'confirmado'])->name('turnos.confirmado');
+        Route::get('/mis-turnos', [MisTurnosController::class, 'index'])->name('turnos.index');
+        Route::post('/mis-turnos/{turno}/cancelar', [MisTurnosController::class, 'cancelar'])->name('turnos.cancelar');
     });
 });

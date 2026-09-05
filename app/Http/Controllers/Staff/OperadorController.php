@@ -65,4 +65,18 @@ class OperadorController extends Controller
 
         return back()->with('status', $mensaje);
     }
+
+    public function resetearPassword(Request $request, Usuario $usuario): RedirectResponse
+    {
+        $empresaActual = Auth::guard('web')->user()->empresa_id;
+        abort_if($usuario->empresa_id !== $empresaActual || $usuario->rol !== 'operador', 403);
+
+        $data = $request->validate([
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+        ]);
+
+        $usuario->update(['password' => Hash::make($data['password'])]);
+
+        return back()->with('status', 'Contraseña del operador actualizada.');
+    }
 }
