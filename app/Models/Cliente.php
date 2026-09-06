@@ -35,6 +35,15 @@ class Cliente extends Authenticatable implements MustVerifyEmail, CanResetPasswo
         return $this->morphMany(Direccion::class, 'direccionable');
     }
 
+    public function empresasRecientes()
+    {
+        return \App\Models\ClienteEmpresaReciente::where('cliente_id', $this->id)
+            ->with('empresa')
+            ->orderByDesc('ultima_interaccion')
+            ->get()
+            ->pluck('empresa');
+    }
+
     public function sendPasswordResetNotification($token): void
     {
         $this->notify(new \App\Notifications\ResetPasswordNotification($token, 'cliente.password.reset'));
