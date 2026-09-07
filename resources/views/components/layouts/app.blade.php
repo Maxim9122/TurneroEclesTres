@@ -41,6 +41,6 @@
     <main class="px-4 py-6 sm:px-6 max-w-5xl mx-auto">
         {{ $slot }}
     </main>
-
+    <x-footer />
 </body>
 </html>

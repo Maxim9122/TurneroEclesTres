@@ -6,15 +6,39 @@
     <title>EclesTres - Encontrá tu salón</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    @vite(['resources/css/app.css'])
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="min-h-screen bg-mate-fondo font-body">
 
-    <header class="bg-mate-superficie border-b border-mate-borde px-4 py-4 sm:px-6 flex items-center justify-between">
+    <header class="bg-mate-superficie border-b border-mate-borde px-4 py-4 sm:px-6 flex items-center justify-between relative">
         <span class="font-display text-xl">EclesTres</span>
-        <div class="flex gap-4 text-sm">
-            <a href="{{ route('cliente.login') }}" class="text-mate-tinta/70">Ingresar</a>
-            <a href="{{ route('staff.registro-empresa') }}" class="text-mate-salvia font-medium">Sumá tu negocio</a>
+
+        <div class="flex items-center gap-4 text-sm">
+            @auth('cliente')
+                <div x-data="{ abierto: false }" class="relative">
+                    <button @click="abierto = !abierto" @click.outside="abierto = false"
+                        class="flex items-center gap-1 text-mate-tinta/80">
+                        Hola, {{ auth('cliente')->user()->nombre }}
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+
+                    <div x-show="abierto" x-cloak
+                        class="absolute right-0 mt-2 w-48 bg-mate-superficie border border-mate-borde rounded-md shadow-lg py-1 z-10">
+                        <a href="{{ route('cliente.home') }}" class="block px-4 py-2 text-sm hover:bg-mate-fondo">Mi cuenta</a>
+                        <a href="{{ route('cliente.turnos.index') }}" class="block px-4 py-2 text-sm hover:bg-mate-fondo">Mis turnos</a>
+                        <form method="POST" action="{{ route('cliente.logout') }}">
+                            @csrf
+                            <button type="submit" class="w-full text-left px-4 py-2 text-sm hover:bg-mate-fondo">Cerrar sesión</button>
+                        </form>
+                    </div>
+                </div>
+            @else
+                <a href="{{ route('cliente.login') }}" class="text-mate-tinta/70">Ingresar</a>
+            @endauth
+
+            <a href="{{ route('staff.registro-empresa') }}" class="text-mate-salvia font-medium whitespace-nowrap">Sumá tu negocio</a>
         </div>
     </header>
 
@@ -75,6 +99,6 @@
             </div>
         @endif
     </main>
-
+    <x-footer />
 </body>
 </html>

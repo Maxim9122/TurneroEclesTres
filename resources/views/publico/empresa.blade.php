@@ -107,6 +107,6 @@
             <a href="{{ route('home') }}" class="underline">EclesTres</a>
         </p>
     </main>
-
+    <x-footer />
 </body>
 </html>

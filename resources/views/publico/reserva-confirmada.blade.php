@@ -25,6 +25,6 @@
 
     <a href="{{ route('cliente.home') }}" class="text-sm text-mate-salvia font-medium">Volver a mi cuenta</a>
 </div>
-
+<x-footer />
 </body>
 </html>
