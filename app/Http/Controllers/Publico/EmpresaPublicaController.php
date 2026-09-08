@@ -16,7 +16,8 @@ class EmpresaPublicaController extends Controller
 
         $servicios = $empresa->servicios()->where('activo', true)->orderBy('nombre')->get();
         $profesionales = $empresa->profesionales()->where('activo', true)->orderBy('nombre')->get();
+        $productos = $empresa->productos()->where('activo', true)->orderBy('nombre')->get();
 
-        return view('publico.empresa', compact('empresa', 'servicios', 'profesionales'));
+        return view('publico.empresa', compact('empresa', 'servicios', 'profesionales', 'productos'));
     }
 }

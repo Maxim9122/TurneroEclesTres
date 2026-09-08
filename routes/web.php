@@ -17,6 +17,10 @@ use App\Http\Controllers\Staff\TurnoController;
 use App\Http\Controllers\Cliente\MisTurnosController;
 use App\Http\Controllers\Auth\ClientePasswordController;
 use App\Http\Controllers\Auth\StaffPasswordController;
+use App\Http\Controllers\Staff\ProductoController;
+use App\Http\Controllers\Publico\CarritoController;
+use App\Http\Controllers\Publico\PedidoController;
+use App\Http\Controllers\Staff\PedidoController as StaffPedidoController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -33,6 +37,13 @@ Route::get('/negocio/{empresa:slug}', [EmpresaPublicaController::class, 'show'])
 Route::get('/negocio/{empresa:slug}/reservar', [ReservaController::class, 'iniciar'])->name('publico.reserva.iniciar');
 Route::get('/negocio/{empresa:slug}/horarios-disponibles', [ReservaController::class, 'horariosDisponibles'])->name('publico.reserva.horarios');
 Route::post('/negocio/{empresa:slug}/reservar', [ReservaController::class, 'confirmar'])->name('publico.reserva.confirmar');
+Route::get('/negocio/{empresa:slug}/carrito', [CarritoController::class, 'index'])->name('publico.carrito.index');
+Route::post('/negocio/{empresa:slug}/carrito/agregar', [CarritoController::class, 'agregar'])->name('publico.carrito.agregar');
+Route::post('/negocio/{empresa:slug}/carrito/{producto}/actualizar', [CarritoController::class, 'actualizar'])->name('publico.carrito.actualizar');
+Route::post('/negocio/{empresa:slug}/carrito/{producto}/quitar', [CarritoController::class, 'quitar'])->name('publico.carrito.quitar');
+
+Route::get('/negocio/{empresa:slug}/comprar', [PedidoController::class, 'iniciar'])->name('publico.pedido.iniciar');
+Route::post('/negocio/{empresa:slug}/comprar', [PedidoController::class, 'confirmar'])->name('publico.pedido.confirmar');
 
 /*
 |--------------------------------------------------------------------------
@@ -68,6 +79,8 @@ Route::prefix('staff')->name('staff.')->group(function () {
             Route::get('/empresa/dashboard', function () {
                 return view('staff.empresa-dashboard');
             })->name('empresa.dashboard');
+            Route::get('/empresa/pedidos', [StaffPedidoController::class, 'index'])->name('empresa.pedidos.index');
+            Route::post('/empresa/pedidos/{pedido}/estado', [StaffPedidoController::class, 'cambiarEstado'])->name('empresa.pedidos.estado');
             Route::post('/empresa/operadores/{usuario}/password', [OperadorController::class, 'resetearPassword'])->name('empresa.operadores.password');
             Route::get('/empresa/turnos', [TurnoController::class, 'index'])->name('empresa.turnos.index');
             Route::get('/empresa/turnos/{turno}/editar', [TurnoController::class, 'edit'])->name('empresa.turnos.edit');
@@ -76,6 +89,12 @@ Route::prefix('staff')->name('staff.')->group(function () {
         });
 
         Route::middleware(['rol:admin'])->group(function () {
+            Route::get('/empresa/productos', [ProductoController::class, 'index'])->name('empresa.productos.index');
+            Route::get('/empresa/productos/nuevo', [ProductoController::class, 'create'])->name('empresa.productos.create');
+            Route::post('/empresa/productos', [ProductoController::class, 'store'])->name('empresa.productos.store');
+            Route::get('/empresa/productos/{producto}/editar', [ProductoController::class, 'edit'])->name('empresa.productos.edit');
+            Route::put('/empresa/productos/{producto}', [ProductoController::class, 'update'])->name('empresa.productos.update');
+            Route::post('/empresa/productos/{producto}/alternar', [ProductoController::class, 'alternarEstado'])->name('empresa.productos.alternar');
             Route::get('/empresa/branding', [EmpresaBrandingController::class, 'edit'])->name('empresa.branding.edit');
             Route::post('/empresa/branding', [EmpresaBrandingController::class, 'update'])->name('empresa.branding.update');
             Route::get('/empresa/direccion', [EmpresaDireccionController::class, 'edit'])->name('empresa.direccion.edit');
@@ -129,6 +148,8 @@ Route::prefix('cuenta')->name('cliente.')->group(function () {
         Route::get('/', function () {
             return view('cliente.home');
         })->name('home');
+        Route::get('/mis-pedidos', [\App\Http\Controllers\Cliente\MisPedidosController::class, 'index'])->name('pedidos.index');
+        Route::get('/pedidos/{pedido}', [PedidoController::class, 'confirmado'])->name('pedidos.confirmado');
         Route::get('/turnos/{turno}', [ReservaController::class, 'confirmado'])->name('turnos.confirmado');
         Route::get('/mis-turnos', [MisTurnosController::class, 'index'])->name('turnos.index');
         Route::post('/mis-turnos/{turno}/cancelar', [MisTurnosController::class, 'cancelar'])->name('turnos.cancelar');

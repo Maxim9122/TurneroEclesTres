@@ -43,6 +43,10 @@
                 class="inline-block mb-6 bg-mate-salvia hover:bg-mate-salvia-oscuro text-white rounded-md px-4 py-2.5 text-sm font-medium">
                 Ver turnos de hoy
             </a>
+            <a href="{{ route('staff.empresa.pedidos.index') }}"
+                class="inline-block mb-6 border border-mate-borde rounded-md px-4 py-2.5 text-sm font-medium">
+                Ver pedidos
+            </a>
             <a href="{{ route('staff.empresa.direccion.edit') }}"
                 class="inline-block border border-mate-borde rounded-md px-4 py-2.5 text-sm font-medium">
                 Configurar dirección
@@ -62,6 +66,10 @@
             <a href="{{ route('staff.empresa.horario-general.edit') }}"
                 class="inline-block border border-mate-borde rounded-md px-4 py-2.5 text-sm font-medium">
                 Horario general del negocio
+            </a>
+            <a href="{{ route('staff.empresa.productos.index') }}"
+                class="inline-block border border-mate-borde rounded-md px-4 py-2.5 text-sm font-medium">
+                Gestionar productos
             </a>
         </div>
     @endif

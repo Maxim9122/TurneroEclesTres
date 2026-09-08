@@ -28,6 +28,16 @@ class Empresa extends Model
         });
     }
 
+    public function productos(): HasMany
+    {
+        return $this->hasMany(Producto::class);
+    }
+
+    public function pedidos(): HasMany
+    {
+        return $this->hasMany(Pedido::class);
+    }
+
     public function usuarios(): HasMany
     {
         return $this->hasMany(Usuario::class);

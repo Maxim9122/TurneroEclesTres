@@ -58,6 +58,51 @@
             @endif
         </section>
 
+        {{-- Productos --}}
+        @if ($productos->isNotEmpty())
+            <section class="mb-8">
+                <div class="flex items-center justify-between mb-3">
+                    <h2 class="font-display text-lg">Productos</h2>
+                    <a href="{{ route('publico.carrito.index', $empresa) }}" class="text-sm text-mate-salvia">Ver carrito →</a>
+                </div>
+
+                <div class="space-y-2">
+                    @foreach ($productos as $producto)
+                        <div class="flex items-center gap-3 bg-mate-superficie border border-mate-borde rounded-md px-3 py-2.5">
+                            @if ($producto->foto_path)
+                                <img src="{{ asset('storage/' . $producto->foto_path) }}" class="w-12 h-12 rounded-md object-cover">
+                            @else
+                                <div class="w-12 h-12 rounded-md bg-mate-borde"></div>
+                            @endif
+
+                            <div class="flex-1">
+                                <p class="text-sm font-medium">{{ $producto->nombre }}</p>
+                                <p class="text-xs text-mate-tinta/60">${{ number_format($producto->precio, 2, ',', '.') }}</p>
+                                @if ($producto->stock === 0)
+                                    <p class="text-xs text-red-700">Sin stock</p>
+                                @endif
+                            </div>
+
+                            @if ($producto->stock > 0)
+                                <form method="POST" action="{{ route('publico.carrito.agregar', $empresa) }}">
+                                    @csrf
+                                    <input type="hidden" name="producto_id" value="{{ $producto->id }}">
+                                    <input type="hidden" name="cantidad" value="1">
+                                    <button type="submit" class="text-xs bg-mate-salvia text-white rounded-md px-3 py-1.5">
+                                        Agregar
+                                    </button>
+                                </form>
+                            @endif
+                        </div>
+                    @endforeach
+                </div>
+
+                @if (session('status'))
+                    <p class="text-xs text-green-700 mt-2">{{ session('status') }}</p>
+                @endif
+            </section>
+        @endif
+
         {{-- Profesionales --}}
         <section class="mb-8">
             <h2 class="font-display text-lg mb-3">¿Con quién te querés atender?</h2>
