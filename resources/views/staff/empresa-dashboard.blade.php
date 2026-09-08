@@ -71,6 +71,14 @@
                 class="inline-block border border-mate-borde rounded-md px-4 py-2.5 text-sm font-medium">
                 Gestionar productos
             </a>
+            <a href="{{ route('staff.empresa.reportes.comisiones') }}"
+                class="inline-block border border-mate-borde rounded-md px-4 py-2.5 text-sm font-medium">
+                Reporte de comisiones
+            </a>
+            <a href="{{ route('staff.empresa.reportes.pedidos') }}"
+                class="inline-block border border-mate-borde rounded-md px-4 py-2.5 text-sm font-medium">
+                Reporte de pedidos
+            </a>
         </div>
     @endif
 

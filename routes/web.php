@@ -21,6 +21,7 @@ use App\Http\Controllers\Staff\ProductoController;
 use App\Http\Controllers\Publico\CarritoController;
 use App\Http\Controllers\Publico\PedidoController;
 use App\Http\Controllers\Staff\PedidoController as StaffPedidoController;
+use App\Http\Controllers\Staff\ReporteController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -89,6 +90,8 @@ Route::prefix('staff')->name('staff.')->group(function () {
         });
 
         Route::middleware(['rol:admin'])->group(function () {
+            Route::get('/empresa/reportes/comisiones', [ReporteController::class, 'comisiones'])->name('empresa.reportes.comisiones');
+            Route::get('/empresa/reportes/pedidos', [ReporteController::class, 'pedidos'])->name('empresa.reportes.pedidos');
             Route::get('/empresa/productos', [ProductoController::class, 'index'])->name('empresa.productos.index');
             Route::get('/empresa/productos/nuevo', [ProductoController::class, 'create'])->name('empresa.productos.create');
             Route::post('/empresa/productos', [ProductoController::class, 'store'])->name('empresa.productos.store');

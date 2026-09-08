@@ -15,12 +15,15 @@ class Profesional extends Model
     protected $table = 'profesionales';
 
     protected $fillable = [
-        'empresa_id', 'usuario_id', 'nombre', 'foto_path', 'activo',
+        'empresa_id', 'usuario_id', 'nombre', 'foto_path', 'activo', 'porcentaje_comision',
     ];
 
     protected function casts(): array
     {
-        return ['activo' => 'boolean'];
+        return [
+            'activo' => 'boolean',
+            'porcentaje_comision' => 'decimal:2',
+        ];
     }
 
     public function empresa(): BelongsTo

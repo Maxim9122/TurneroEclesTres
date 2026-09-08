@@ -40,3 +40,13 @@
         Elegilo solo si esta persona también entra al sistema como operador y este es su propio perfil de agenda.
     </p>
 </div>
+
+<div>
+    <label class="block text-sm mb-1">Porcentaje de comisión (%)</label>
+    <input type="number" name="porcentaje_comision" min="0" max="100" step="0.01"
+        value="{{ old('porcentaje_comision', $profesional->porcentaje_comision ?? 50) }}"
+        class="w-full rounded-md border border-mate-borde bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-mate-salvia">
+    <p class="text-xs text-mate-tinta/50 mt-1">
+        Porcentaje que se lleva el profesional sobre lo recaudado en servicios (el resto queda para el negocio).
+    </p>
+</div>

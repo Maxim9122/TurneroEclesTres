@@ -44,6 +44,7 @@ class ProfesionalController extends Controller
         $profesional = $empresa->profesionales()->create([
             'nombre' => $data['nombre'],
             'usuario_id' => $data['usuario_id'] ?? null,
+            'porcentaje_comision' => $data['porcentaje_comision'],
             'activo' => true,
         ]);
 
@@ -82,6 +83,7 @@ class ProfesionalController extends Controller
         $profesional->update([
             'nombre' => $data['nombre'],
             'usuario_id' => $data['usuario_id'] ?? null,
+            'porcentaje_comision' => $data['porcentaje_comision'],
         ]);
 
         if ($request->hasFile('foto')) {
@@ -109,6 +111,7 @@ class ProfesionalController extends Controller
             'nombre' => ['required', 'string', 'max:150'],
             'usuario_id' => ['nullable', 'exists:usuarios,id'],
             'foto' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'porcentaje_comision' => ['required', 'numeric', 'min:0', 'max:100'],
         ]);
 
         // Si eligió un operador, confirmamos que sea de la misma empresa
