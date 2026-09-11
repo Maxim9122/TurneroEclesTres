@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
+use App\Models\Usuario;
+use App\Support\WhatsApp;
 
 class StaffPasswordController extends Controller
 {
@@ -21,11 +23,17 @@ class StaffPasswordController extends Controller
     {
         $request->validate(['email' => ['required', 'email']]);
 
-        $status = Password::broker('usuarios')->sendResetLink(
-            $request->only('email')
-        );
+        $usuario = Usuario::where('email', $request->email)->first();
 
-        return back()->with('status', __($status));
+        if (!$usuario) {
+            return back()->withErrors(['email' => 'No encontramos ningún usuario con ese email.'])->withInput();
+        }
+
+        $mensaje = "Hola! Necesito recuperar mi contraseña del panel de EclesTres. Mi email registrado es: {$usuario->email}";
+
+        return redirect()->away(
+            WhatsApp::linkChat('3841670079', $mensaje)
+        );
     }
 
     public function showReset(Request $request, string $token): View

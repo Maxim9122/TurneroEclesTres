@@ -44,5 +44,9 @@
             class="inline-block border border-mate-borde rounded-md px-4 py-2.5 text-sm font-medium">
             Mis pedidos
         </a>
+        <a href="{{ route('cliente.mi-perfil.edit') }}"
+            class="inline-block border border-mate-borde rounded-md px-4 py-2.5 text-sm font-medium">
+            Mi perfil
+        </a>
     </div>
 </x-layouts.app>

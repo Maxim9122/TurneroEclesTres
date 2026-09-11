@@ -1,6 +1,6 @@
 <x-layouts.guest title="Recuperar contraseña - EclesTres">
     <h1 class="font-display text-xl mb-1">Recuperar contraseña</h1>
-    <p class="text-sm text-mate-tinta/70 mb-6">Te vamos a enviar un link para crear una nueva.</p>
+    <p class="text-sm text-mate-tinta/70 mb-6">Te vamos a redirigir a WhatsApp para coordinar la recuperación con nosotros.</p>
 
     @if (session('status'))
         <div class="mb-4 text-sm text-green-800 bg-green-50 border border-green-200 rounded-md p-3">
@@ -23,7 +23,7 @@
         </div>
         <button type="submit"
             class="w-full bg-mate-salvia hover:bg-mate-salvia-oscuro text-white rounded-md py-2.5 text-sm font-medium">
-            Enviar link
+            Solicitar por WhatsApp
         </button>
     </form>
 

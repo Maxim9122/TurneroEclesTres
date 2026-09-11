@@ -30,6 +30,7 @@ class EmpresaRegisterController extends Controller
             'altura' => ['nullable', 'string', 'max:20'],
             'admin_nombre' => ['required', 'string', 'max:255'],
             'admin_email' => ['required', 'email', 'unique:usuarios,email'],
+            'admin_telefono' => ['required', 'string', 'max:30'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
         ]);
 
@@ -52,6 +53,7 @@ class EmpresaRegisterController extends Controller
                 'empresa_id' => $empresa->id,
                 'nombre' => $data['admin_nombre'],
                 'email' => $data['admin_email'],
+                'telefono' => $data['admin_telefono'],
                 'password' => Hash::make($data['password']),
                 'rol' => 'admin',
                 'activo' => true,

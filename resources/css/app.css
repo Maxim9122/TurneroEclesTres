@@ -9,14 +9,16 @@
   --color-mate-superficie: #F7F4EE;
   --color-mate-borde: #DDD5C7;
 
-  --font-display: "Fraunces", ui-serif, serif;
-  --font-body: "Inter", ui-sans-serif, sans-serif;
+  --font-display: "Fraunces", serif;
+  --font-body: "Inter", sans-serif;
 }
 
 body {
   background-color: var(--color-mate-fondo);
   color: var(--color-mate-tinta);
   font-family: var(--font-body);
+  font-weight: 500;
+  -webkit-font-smoothing: antialiased;
 }
 
 h1, h2, h3, .font-display {

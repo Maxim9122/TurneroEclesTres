@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\View\View;
+use App\Models\Cliente;
+use App\Support\WhatsApp;
 
 class ClientePasswordController extends Controller
 {
@@ -20,11 +22,17 @@ class ClientePasswordController extends Controller
     {
         $request->validate(['email' => ['required', 'email']]);
 
-        $status = Password::broker('clientes')->sendResetLink(
-            $request->only('email')
-        );
+        $cliente = Cliente::where('email', $request->email)->first();
 
-        return back()->with('status', __($status));
+        if (!$cliente) {
+            return back()->withErrors(['email' => 'No encontramos ningún usuario con ese email.'])->withInput();
+        }
+
+        $mensaje = "Hola! Necesito recuperar mi contraseña de mi cuenta de cliente en EclesTres. Mi email registrado es: {$cliente->email}";
+
+        return redirect()->away(
+            WhatsApp::linkChat('3841670079', $mensaje)
+        );
     }
 
     public function showReset(Request $request, string $token): View

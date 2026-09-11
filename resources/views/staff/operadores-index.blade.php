@@ -34,6 +34,9 @@
                         <button type="submit" class="text-xs underline text-mate-tinta/70">
                             {{ $operador->activo ? 'Desactivar' : 'Activar' }}
                         </button>
+                        <a href="{{ route('staff.empresa.operadores.edit', $operador) }}" class="text-xs underline text-mate-tinta/70">
+                            Editar datos
+                        </a>
                     </form>
                     <details class="text-xs">
                         <summary class="underline text-mate-tinta/70 cursor-pointer">Cambiar contraseña</summary>

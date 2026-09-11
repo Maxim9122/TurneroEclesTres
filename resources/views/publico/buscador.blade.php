@@ -11,7 +11,7 @@
 <body class="min-h-screen bg-mate-fondo font-body">
 
     <header class="bg-mate-superficie border-b border-mate-borde px-4 py-4 sm:px-6 flex items-center justify-between relative">
-        <span class="font-display text-xl">EclesTres</span>
+        <x-brand size="text-xl" />
 
         <div class="flex items-center gap-4 text-sm">
             @auth('cliente')

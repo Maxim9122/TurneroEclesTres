@@ -79,6 +79,13 @@
         </div>
 
         <div>
+            <label class="block text-sm mb-1">Tu teléfono (WhatsApp)</label>
+            <input type="tel" name="admin_telefono" required value="{{ old('admin_telefono') }}"
+                placeholder="Ej: 3841670079"
+                class="w-full rounded-md border border-mate-borde bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-mate-salvia">
+        </div>
+
+        <div>
             <label class="block text-sm mb-1">Contraseña</label>
             <input type="password" name="password" required
                 class="w-full rounded-md border border-mate-borde bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-mate-salvia">

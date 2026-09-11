@@ -68,6 +68,23 @@
                 </div>
 
                 <div class="flex flex-wrap gap-2 mt-3 text-sm">
+                    @php
+                        $itemsTexto = $pedido->items->map(fn ($item) => "{$item->cantidad}x {$item->producto->nombre}")->implode(', ');
+                        $mensajePedido = "Hola {$pedido->cliente->nombre}! Te confirmamos tu pedido en {$pedido->empresa->nombre}: "
+                            . $itemsTexto . ". Total: \${$pedido->total}. "
+                            . ($pedido->metodo_entrega === 'retiro' ? 'Podés retirarlo en el local.' : 'Coordinamos el envío a tu domicilio.');
+                        $linkWhatsappPedido = \App\Support\WhatsApp::linkChat($pedido->cliente->telefono, $mensajePedido);
+                    @endphp
+                    <a href="{{ route('staff.empresa.pedidos.remito', $pedido) }}" target="_blank" class="underline text-mate-salvia">
+                        📄 Enviar remito
+                    </a>
+                    @if ($linkWhatsappPedido)
+                        <a href="{{ $linkWhatsappPedido }}" target="_blank" class="underline text-green-700">
+                            📱 Enviar WhatsApp
+                        </a>
+                    @else
+                        <span class="text-mate-tinta/40 text-xs">Cliente sin teléfono cargado</span>
+                    @endif
                     @if ($pedido->estado === 'pendiente')
                         <form method="POST" action="{{ route('staff.empresa.pedidos.estado', $pedido) }}">
                             @csrf

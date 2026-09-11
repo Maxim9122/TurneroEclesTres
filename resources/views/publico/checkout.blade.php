@@ -11,7 +11,7 @@
 <body class="min-h-screen bg-mate-fondo font-body flex flex-col">
 
 <header class="bg-mate-superficie border-b border-mate-borde px-4 py-4">
-    <a href="{{ route('publico.carrito.index', $empresa) }}" class="text-sm text-mate-salvia">&larr; Volver al carrito</a>
+    <x-empresa-topbar :empresa="$empresa" :back-route="route('publico.carrito.index', $empresa)" back-label="Finalizando compra" />
 </header>
 
 <main class="flex-1 max-w-md mx-auto px-4 py-6 w-full" x-data="{ metodo: 'retiro', direccionExistente: '{{ $direcciones->first()->id ?? '' }}' }">

@@ -12,7 +12,7 @@
         <div class="flex-1 flex items-center justify-center px-4 py-10">
             <div class="w-full max-w-md">
                 <div class="text-center mb-8">
-                    <span class="font-display text-3xl text-mate-tinta">EclesTres</span>
+                    <x-brand size="text-3xl" />
                 </div>
 
                 <div class="bg-mate-superficie border border-mate-borde rounded-lg p-6 sm:p-8 shadow-sm">

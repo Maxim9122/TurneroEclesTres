@@ -6,4 +6,12 @@
         class="inline-block bg-mate-salvia hover:bg-mate-salvia-oscuro text-white rounded-md px-4 py-2.5 text-sm font-medium">
         Ver empresas registradas
     </a>
+    <a href="{{ route('staff.plataforma.clientes.index') }}"
+        class="inline-block border border-mate-borde rounded-md px-4 py-2.5 text-sm font-medium">
+        Clientes
+    </a>
+    <a href="{{ route('staff.plataforma.staff.index') }}"
+        class="inline-block border border-mate-borde rounded-md px-4 py-2.5 text-sm font-medium">
+        Staff de empresas
+    </a>
 </x-layouts.app>

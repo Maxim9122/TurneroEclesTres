@@ -26,10 +26,8 @@
                     @endif
                     <div>
                         <p class="font-medium text-sm">{{ $profesional->nombre }}</p>
-                        <p class="text-xs text-mate-tinta/60">
-                            {{ $profesional->usuario ? 'Vinculado a ' . $profesional->usuario->nombre : 'Sin usuario del sistema' }}
-                        </p>
-                    </div>
+                        <p class="text-xs text-mate-tinta/60">{{ $profesional->porcentaje_comision }}% de comisión</p>
+                    </div>                    
                 </div>
 
                 <div class="flex items-center gap-3 text-sm">

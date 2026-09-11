@@ -26,22 +26,6 @@
 </div>
 
 <div>
-    <label class="block text-sm mb-1">Vincular a un operador (opcional)</label>
-    <select name="usuario_id" class="w-full rounded-md border border-mate-borde bg-white px-3 py-2 text-sm">
-        <option value="">Ninguno — no usa el sistema</option>
-        @foreach ($operadoresDisponibles as $operador)
-            <option value="{{ $operador->id }}"
-                @selected(old('usuario_id', $profesional->usuario_id ?? null) == $operador->id)>
-                {{ $operador->nombre }} ({{ $operador->email }})
-            </option>
-        @endforeach
-    </select>
-    <p class="text-xs text-mate-tinta/50 mt-1">
-        Elegilo solo si esta persona también entra al sistema como operador y este es su propio perfil de agenda.
-    </p>
-</div>
-
-<div>
     <label class="block text-sm mb-1">Porcentaje de comisión (%)</label>
     <input type="number" name="porcentaje_comision" min="0" max="100" step="0.01"
         value="{{ old('porcentaje_comision', $profesional->porcentaje_comision ?? 50) }}"

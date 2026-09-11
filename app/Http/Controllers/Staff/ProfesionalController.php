@@ -23,27 +23,17 @@ class ProfesionalController extends Controller
 
     public function create(): View
     {
-        $empresa = Auth::guard('web')->user()->empresa;
-
-        // Operadores de esta empresa que todavía no están vinculados a ningún profesional
-        $operadoresDisponibles = $empresa->usuarios()
-            ->where('rol', 'operador')
-            ->whereDoesntHave('profesional')
-            ->orderBy('nombre')
-            ->get();
-
-        return view('staff.profesionales-create', compact('operadoresDisponibles'));
+        return view('staff.profesionales-create');
     }
 
     public function store(Request $request): RedirectResponse
     {
         $empresa = Auth::guard('web')->user()->empresa;
 
-        $data = $this->validarDatos($request, $empresa->id);
+        $data = $this->validarDatos($request);
 
         $profesional = $empresa->profesionales()->create([
             'nombre' => $data['nombre'],
-            'usuario_id' => $data['usuario_id'] ?? null,
             'porcentaje_comision' => $data['porcentaje_comision'],
             'activo' => true,
         ]);
@@ -60,29 +50,17 @@ class ProfesionalController extends Controller
     {
         $this->autorizarAdmin($profesional);
 
-        $empresa = $profesional->empresa;
-
-        $operadoresDisponibles = $empresa->usuarios()
-            ->where('rol', 'operador')
-            ->where(function ($q) use ($profesional) {
-                $q->whereDoesntHave('profesional')
-                    ->orWhereHas('profesional', fn ($sub) => $sub->where('profesionales.id', $profesional->id));
-            })
-            ->orderBy('nombre')
-            ->get();
-
-        return view('staff.profesionales-edit', compact('profesional', 'operadoresDisponibles'));
+        return view('staff.profesionales-edit', compact('profesional'));
     }
 
     public function update(Request $request, Profesional $profesional): RedirectResponse
     {
         $this->autorizarAdmin($profesional);
 
-        $data = $this->validarDatos($request, $profesional->empresa_id, $profesional->id);
+        $data = $this->validarDatos($request);
 
         $profesional->update([
             'nombre' => $data['nombre'],
-            'usuario_id' => $data['usuario_id'] ?? null,
             'porcentaje_comision' => $data['porcentaje_comision'],
         ]);
 
@@ -105,33 +83,13 @@ class ProfesionalController extends Controller
         return back()->with('status', $mensaje);
     }
 
-    private function validarDatos(Request $request, int $empresaId, ?int $profesionalIdActual = null): array
+    private function validarDatos(Request $request): array
     {
-        $data = $request->validate([
+        return $request->validate([
             'nombre' => ['required', 'string', 'max:150'],
-            'usuario_id' => ['nullable', 'exists:usuarios,id'],
             'foto' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
             'porcentaje_comision' => ['required', 'numeric', 'min:0', 'max:100'],
         ]);
-
-        // Si eligió un operador, confirmamos que sea de la misma empresa
-        // y que no esté ya vinculado a OTRO profesional.
-        if (!empty($data['usuario_id'])) {
-            $usuario = \App\Models\Usuario::where('id', $data['usuario_id'])
-                ->where('empresa_id', $empresaId)
-                ->where('rol', 'operador')
-                ->first();
-
-            abort_if(!$usuario, 422, 'El operador seleccionado no es válido.');
-
-            $yaVinculado = \App\Models\Profesional::where('usuario_id', $usuario->id)
-                ->when($profesionalIdActual, fn ($q) => $q->where('id', '!=', $profesionalIdActual))
-                ->exists();
-
-            abort_if($yaVinculado, 422, 'Ese operador ya está vinculado a otro profesional.');
-        }
-
-        return $data;
     }
 
     private function guardarFoto(Profesional $profesional, Request $request): void

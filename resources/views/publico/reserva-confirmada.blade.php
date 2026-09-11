@@ -9,7 +9,7 @@
     @vite(['resources/css/app.css'])
 </head>
 <body class="min-h-screen bg-mate-fondo font-body flex items-center justify-center px-4">
-
+<x-empresa-topbar :empresa="$turno->empresa" back-label="¡Turno confirmado!" />
 <div class="max-w-sm w-full bg-mate-superficie border border-mate-borde rounded-lg p-6 text-center">
     <div class="text-4xl mb-3">✅</div>
     <h1 class="font-display text-xl mb-2">¡Turno confirmado!</h1>

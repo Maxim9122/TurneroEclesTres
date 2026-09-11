@@ -11,7 +11,7 @@
 <body class="min-h-screen bg-mate-fondo font-body">
 
 <header class="bg-mate-superficie border-b border-mate-borde px-4 py-4">
-    <a href="{{ route('publico.empresa', $empresa) }}" class="text-sm text-mate-salvia">&larr; {{ $empresa->nombre }}</a>
+    <x-empresa-topbar :empresa="$empresa" :back-route="route('publico.empresa', $empresa)" back-label="Reservando turno" />
 </header>
 
 <main class="max-w-md mx-auto px-4 py-6"

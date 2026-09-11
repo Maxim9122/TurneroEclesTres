@@ -79,4 +79,33 @@ class OperadorController extends Controller
 
         return back()->with('status', 'Contraseña del operador actualizada.');
     }
+
+    public function edit(Usuario $usuario): View
+    {
+        $this->autorizar($usuario);
+
+        return view('staff.operadores-edit', compact('usuario'));
+    }
+
+    public function update(Request $request, Usuario $usuario): RedirectResponse
+    {
+        $this->autorizar($usuario);
+
+        $data = $request->validate([
+            'nombre' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'unique:usuarios,email,' . $usuario->id],
+            'telefono' => ['nullable', 'string', 'max:30'],
+        ]);
+
+        $usuario->update($data);
+
+        return redirect()->route('staff.empresa.operadores.index')
+            ->with('status', 'Datos del operador actualizados.');
+    }
+
+    private function autorizar(Usuario $usuario): void
+    {
+        $empresaActual = Auth::guard('web')->user()->empresa_id;
+        abort_if($usuario->empresa_id !== $empresaActual || $usuario->rol !== 'operador', 403);
+    }
 }

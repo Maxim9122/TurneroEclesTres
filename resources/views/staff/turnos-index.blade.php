@@ -47,6 +47,22 @@
                 </div>
 
                 <div class="flex flex-wrap gap-2 mt-3 text-sm">
+                    @php
+                        $mensajeTurno = "Hola {$turno->cliente->nombre}! Te confirmamos tu turno en {$turno->empresa->nombre} "
+                            . "para el {$turno->fecha->format('d/m/Y')} a las " . substr($turno->hora_inicio, 0, 5) . "hs. "
+                            . "Servicios: " . $turno->servicios->pluck('nombre')->implode(' + ') . ". ¡Te esperamos!";
+                        $linkWhatsapp = \App\Support\WhatsApp::linkChat($turno->cliente->telefono, $mensajeTurno);
+                    @endphp
+                    <a href="{{ route('staff.empresa.turnos.remito', $turno) }}" target="_blank" class="underline text-mate-salvia">
+                        📄 Enviar comprobante
+                    </a>
+                    @if ($linkWhatsapp)
+                        <a href="{{ $linkWhatsapp }}" target="_blank" class="underline text-green-700">
+                            📱 Enviar WhatsApp
+                        </a>
+                    @else
+                        <span class="text-mate-tinta/40 text-xs">Cliente sin teléfono cargado</span>
+                    @endif
                     <a href="{{ route('staff.empresa.turnos.edit', $turno) }}" class="underline text-mate-tinta/70">
                         Editar profesional/servicios
                     </a>
