@@ -20,6 +20,13 @@
             <input type="password" name="password" required
                 class="w-full rounded-md border border-mate-borde bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-mate-salvia">
         </div>
+        <label class="flex items-center gap-2 text-sm text-mate-tinta/70">
+            <input type="checkbox" name="recordar" class="rounded border-mate-borde">
+            Mantenerme conectado
+        </label>
+        <p class="text-sm text-right">
+            <a href="{{ route('cliente.password.request') }}" class="text-mate-salvia">¿Olvidaste tu contraseña?</a>
+        </p>
         <button type="submit"
             class="w-full bg-mate-salvia hover:bg-mate-salvia-oscuro text-white rounded-md py-2.5 text-sm font-medium transition-colors">
             Ingresar
@@ -28,8 +35,5 @@
 
     <p class="text-sm text-center text-mate-tinta/70 mt-6">
         ¿No tenés cuenta? <a href="{{ route('cliente.register') }}" class="text-mate-salvia font-medium">Registrate</a>
-    </p>
-    <p class="text-sm text-right">
-        <a href="{{ route('cliente.password.request') }}" class="text-mate-salvia">¿Olvidaste tu contraseña?</a>
-    </p>
+    </p>    
 </x-layouts.guest>

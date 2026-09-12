@@ -25,14 +25,21 @@ class EmpresaAdminController extends Controller
 
     public function activar(Empresa $empresa): RedirectResponse
     {
-        $empresa->update(['estado' => 'activa']);
+        $empresa->update(['estado' => 'activa', 'motivo_rechazo' => null]);
 
         return back()->with('status', "Empresa \"{$empresa->nombre}\" activada.");
     }
 
-    public function rechazar(Empresa $empresa): RedirectResponse
+    public function rechazar(Request $request, Empresa $empresa): RedirectResponse
     {
-        $empresa->update(['estado' => 'rechazada']);
+        $data = $request->validate([
+            'motivo_rechazo' => ['required', 'string', 'max:500'],
+        ]);
+
+        $empresa->update([
+            'estado' => 'rechazada',
+            'motivo_rechazo' => $data['motivo_rechazo'],
+        ]);
 
         return back()->with('status', "Empresa \"{$empresa->nombre}\" rechazada.");
     }
@@ -46,7 +53,7 @@ class EmpresaAdminController extends Controller
 
     public function reactivar(Empresa $empresa): RedirectResponse
     {
-        $empresa->update(['estado' => 'activa']);
+        $empresa->update(['estado' => 'activa', 'motivo_rechazo' => null]);
 
         return back()->with('status', "Empresa \"{$empresa->nombre}\" reactivada.");
     }

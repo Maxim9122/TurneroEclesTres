@@ -26,10 +26,16 @@
             <select name="rubro" required
                 class="w-full rounded-md border border-mate-borde bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-mate-salvia">
                 <option value="">Seleccioná...</option>
-                <option value="peluqueria">Peluquería</option>
-                <option value="barberia">Barbería</option>
-                <option value="estetica">Estética</option>
-                <option value="unas">Uñas</option>
+                <optgroup label="Estética y belleza">
+                    <option value="peluqueria">Peluquería</option>
+                    <option value="barberia">Barbería</option>
+                    <option value="estetica">Estética</option>
+                    <option value="unas">Uñas</option>
+                </optgroup>
+                <option value="salud">Salud</option>
+                <option value="especialista">Especialista</option>
+                <option value="profesion">Profesión</option>
+                <option value="otro">Otro</option>
             </select>
         </div>
 
@@ -96,9 +102,11 @@
             <input type="password" name="password_confirmation" required
                 class="w-full rounded-md border border-mate-borde bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-mate-salvia">
         </div>
+        
+        <x-recaptcha />
 
         <button type="submit"
-            class="w-full bg-mate-salvia hover:bg-mate-salvia-oscuro text-white rounded-md py-2.5 text-sm font-medium transition-colors">
+            class="w-full bg-mate-salvia hover:bg-mate-salvia-oscuro text-white rounded-md py-2.5 text-sm font-medium">
             Registrar mi negocio
         </button>
     </form>

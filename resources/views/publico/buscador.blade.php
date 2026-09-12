@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EclesTres - Encontrá tu salón</title>
+    <title>EclesTres - Turnos y productos cerca tuyo</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -43,8 +43,8 @@
     </header>
 
     <section class="px-4 py-10 sm:px-6 text-center bg-mate-superficie border-b border-mate-borde">
-        <h1 class="font-display text-3xl sm:text-4xl mb-2">Encontrá tu salón ideal</h1>
-        <p class="text-sm text-mate-tinta/70 mb-6">Peluquerías, barberías, estéticas y uñas cerca tuyo.</p>
+        <h1 class="font-display text-3xl sm:text-4xl mb-2">Encontrá tu turno o producto ideal</h1>
+        <p class="text-sm text-mate-tinta/70 mb-6">Belleza, salud y bienestar, todo en un solo lugar.</p>
 
         <form method="GET" action="{{ route('home') }}"
             class="max-w-2xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -52,12 +52,16 @@
                 class="sm:col-span-2 rounded-md border border-mate-borde bg-white px-3 py-2 text-sm">
 
             <select name="rubro" class="rounded-md border border-mate-borde bg-white px-3 py-2 text-sm">
-                <option value="">Todos los rubros</option>
-                <option value="peluqueria" @selected($rubro === 'peluqueria')>Peluquería</option>
-                <option value="barberia" @selected($rubro === 'barberia')>Barbería</option>
-                <option value="estetica" @selected($rubro === 'estetica')>Estética</option>
-                <option value="unas" @selected($rubro === 'unas')>Uñas</option>
-            </select>
+            <option value="">Todos los rubros</option>
+            <option value="peluqueria" @selected($rubro === 'peluqueria')>Peluquería</option>
+            <option value="barberia" @selected($rubro === 'barberia')>Barbería</option>
+            <option value="estetica" @selected($rubro === 'estetica')>Estética</option>
+            <option value="unas" @selected($rubro === 'unas')>Uñas</option>
+            <option value="salud" @selected($rubro === 'salud')>Salud</option>
+            <option value="especialista" @selected($rubro === 'especialista')>Especialista</option>
+            <option value="profesion" @selected($rubro === 'profesion')>Profesión</option>
+            <option value="otro" @selected($rubro === 'otro')>Otro</option>
+        </select>
 
             <button type="submit"
                 class="sm:col-span-3 bg-mate-salvia hover:bg-mate-salvia-oscuro text-white rounded-md px-4 py-2 text-sm font-medium">

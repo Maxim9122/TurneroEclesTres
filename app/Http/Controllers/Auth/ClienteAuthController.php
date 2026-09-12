@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
+use App\Rules\Recaptcha;
 
 class ClienteAuthController extends Controller
 {
@@ -47,6 +48,7 @@ class ClienteAuthController extends Controller
             'email' => ['required', 'email', 'unique:clientes,email'],
             'telefono' => ['nullable', 'string', 'max:30'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'g-recaptcha-response' => [new Recaptcha()],
         ]);
 
         $cliente = Cliente::create([
@@ -56,7 +58,7 @@ class ClienteAuthController extends Controller
             'password' => Hash::make($data['password']),
         ]);
 
-        Auth::guard('cliente')->login($cliente);
+        Auth::guard('cliente')->login($cliente, true);
 
         return redirect()->route('cliente.home');
     }

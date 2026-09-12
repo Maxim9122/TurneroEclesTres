@@ -39,6 +39,7 @@
             <input type="password" name="password_confirmation" required
                 class="w-full rounded-md border border-mate-borde bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-mate-salvia">
         </div>
+        <x-recaptcha />
         <button type="submit"
             class="w-full bg-mate-salvia hover:bg-mate-salvia-oscuro text-white rounded-md py-2.5 text-sm font-medium transition-colors">
             Crear cuenta

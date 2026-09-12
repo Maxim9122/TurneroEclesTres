@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use App\Rules\Recaptcha;
 
 class EmpresaRegisterController extends Controller
 {
@@ -22,7 +23,7 @@ class EmpresaRegisterController extends Controller
     {
         $data = $request->validate([
             'empresa_nombre' => ['required', 'string', 'max:255'],
-            'rubro' => ['required', 'in:peluqueria,barberia,estetica,unas'],
+            'rubro' => ['required', 'in:peluqueria,barberia,estetica,unas,salud,especialista,profesion,otro'],
             'telefono' => ['nullable', 'string', 'max:30'],
             'ciudad' => ['required', 'string', 'max:120'],
             'barrio' => ['required', 'string', 'max:120'],
@@ -32,6 +33,7 @@ class EmpresaRegisterController extends Controller
             'admin_email' => ['required', 'email', 'unique:usuarios,email'],
             'admin_telefono' => ['required', 'string', 'max:30'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'g-recaptcha-response' => [new Recaptcha()],
         ]);
 
         $usuario = DB::transaction(function () use ($data) {
