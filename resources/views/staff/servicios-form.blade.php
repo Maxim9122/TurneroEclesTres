@@ -30,6 +30,17 @@
     </div>
 </div>
 
+<div>
+    <label class="block text-sm mb-1">Días para renovar (opcional)</label>
+    <input type="number" name="dias_renovacion" min="1"
+        value="{{ old('dias_renovacion', $servicio->dias_renovacion ?? '') }}"
+        placeholder="Ej: 20 para una tintura"
+        class="w-full rounded-md border border-mate-borde bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-mate-salvia">
+    <p class="text-xs text-mate-tinta/50 mt-1">
+        Si lo cargás, el sistema va a avisar cuándo el cliente debería volver a hacerse este servicio.
+    </p>
+</div>
+
 <p class="text-xs text-mate-tinta/50">
     Si un cliente quiere "Degradé + Barba", va a poder elegir ambos servicios por separado al reservar — no hace falta cargarlos como combo.
 </p>

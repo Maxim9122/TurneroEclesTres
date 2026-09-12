@@ -15,6 +15,21 @@
 </div>
 
 <div>
+    <label class="block text-sm mb-1">Categoría</label>
+    <select name="categoria_id" class="w-full rounded-md border border-mate-borde bg-white px-3 py-2 text-sm">
+        <option value="">Sin categoría</option>
+        @foreach (\Illuminate\Support\Facades\Auth::guard('web')->user()->empresa->categoriasProductos()->orderBy('nombre')->get() as $cat)
+            <option value="{{ $cat->id }}" @selected(old('categoria_id', $producto->categoria_id ?? null) == $cat->id)>
+                {{ $cat->nombre }}
+            </option>
+        @endforeach
+    </select>
+    <p class="text-xs text-mate-tinta/50 mt-1">
+        <a href="{{ route('staff.empresa.categorias.index') }}" class="underline">Gestionar categorías</a>
+    </p>
+</div>
+
+<div>
     <label class="block text-sm mb-1">Descripción (opcional)</label>
     <textarea name="descripcion" rows="3"
         class="w-full rounded-md border border-mate-borde bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-mate-salvia">{{ old('descripcion', $producto->descripcion ?? '') }}</textarea>

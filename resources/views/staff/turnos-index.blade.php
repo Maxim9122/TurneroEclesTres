@@ -16,7 +16,7 @@
             class="rounded-md border border-mate-borde bg-white px-3 py-2 text-sm">
     </form>
 
-    <div class="space-y-3">
+    <div class="space-y-3" x-data="{ modalAbierto: false, formPendiente: null, mensajePendiente: '' }">
         @forelse ($turnos as $turno)
             <div class="bg-mate-superficie border border-mate-borde rounded-lg p-4">
                 <div class="flex items-start justify-between gap-3 flex-wrap">
@@ -53,9 +53,7 @@
                             . "Servicios: " . $turno->servicios->pluck('nombre')->implode(' + ') . ". ¡Te esperamos!";
                         $linkWhatsapp = \App\Support\WhatsApp::linkChat($turno->cliente->telefono, $mensajeTurno);
                     @endphp
-                    <a href="{{ route('staff.empresa.turnos.remito', $turno) }}" target="_blank" class="underline text-mate-salvia">
-                        📄 Enviar comprobante
-                    </a>
+
                     @if ($linkWhatsapp)
                         <a href="{{ $linkWhatsapp }}" target="_blank" class="underline text-green-700">
                             📱 Enviar WhatsApp
@@ -63,6 +61,11 @@
                     @else
                         <span class="text-mate-tinta/40 text-xs">Cliente sin teléfono cargado</span>
                     @endif
+
+                    <a href="{{ route('staff.empresa.turnos.remito', $turno) }}" target="_blank" class="underline text-mate-salvia">
+                        📄 Enviar comprobante
+                    </a>
+
                     <a href="{{ route('staff.empresa.turnos.edit', $turno) }}" class="underline text-mate-tinta/70">
                         Editar profesional/servicios
                     </a>
@@ -71,7 +74,10 @@
                         <form method="POST" action="{{ route('staff.empresa.turnos.estado', $turno) }}">
                             @csrf
                             <input type="hidden" name="estado" value="confirmado">
-                            <button class="underline text-green-700">Confirmar</button>
+                            <button type="button" class="underline text-green-700"
+                                @click="modalAbierto = true; formPendiente = $el.closest('form'); mensajePendiente = '¿Confirmar este turno?'">
+                                Confirmar
+                            </button>
                         </form>
                     @endif
 
@@ -79,7 +85,10 @@
                         <form method="POST" action="{{ route('staff.empresa.turnos.estado', $turno) }}">
                             @csrf
                             <input type="hidden" name="estado" value="cancelado">
-                            <button class="underline text-red-700">Cancelar</button>
+                            <button type="button" class="underline text-red-700"
+                                @click="modalAbierto = true; formPendiente = $el.closest('form'); mensajePendiente = '¿Cancelar este turno? Esta acción no se puede deshacer.'">
+                                Cancelar
+                            </button>
                         </form>
                     @endif
 
@@ -87,12 +96,18 @@
                         <form method="POST" action="{{ route('staff.empresa.turnos.estado', $turno) }}">
                             @csrf
                             <input type="hidden" name="estado" value="completado">
-                            <button class="underline text-blue-700">Completado</button>
+                            <button type="button" class="underline text-blue-700"
+                                @click="modalAbierto = true; formPendiente = $el.closest('form'); mensajePendiente = '¿Marcar este turno como completado?'">
+                                Completado
+                            </button>
                         </form>
                         <form method="POST" action="{{ route('staff.empresa.turnos.estado', $turno) }}">
                             @csrf
                             <input type="hidden" name="estado" value="no_show">
-                            <button class="underline text-red-700">No asistió</button>
+                            <button type="button" class="underline text-red-700"
+                                @click="modalAbierto = true; formPendiente = $el.closest('form'); mensajePendiente = '¿Marcar que el cliente no asistió?'">
+                                No asistió
+                            </button>
                         </form>
                     @endif
                 </div>
@@ -100,5 +115,24 @@
         @empty
             <p class="text-sm text-mate-tinta/60">No hay turnos para esta fecha.</p>
         @endforelse
+
+        {{-- Modal de confirmación --}}
+        <div x-show="modalAbierto" x-cloak
+            class="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50"
+            style="display: none;">
+            <div @click.outside="modalAbierto = false" class="bg-white rounded-lg max-w-sm w-full p-5">
+                <p class="text-sm mb-5" x-text="mensajePendiente"></p>
+                <div class="flex gap-2">
+                    <button type="button" @click="modalAbierto = false"
+                        class="flex-1 border border-mate-borde rounded-md py-2 text-sm font-medium">
+                        Cancelar
+                    </button>
+                    <button type="button" @click="modalAbierto = false; $nextTick(() => formPendiente.submit())"
+                        class="flex-1 bg-mate-salvia hover:bg-mate-salvia-oscuro text-white rounded-md py-2 text-sm font-medium">
+                        Sí, confirmar
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 </x-layouts.app>

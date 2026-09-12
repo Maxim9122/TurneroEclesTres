@@ -33,6 +33,11 @@ class Empresa extends Model
         return $this->hasMany(Producto::class);
     }
 
+    public function categoriasProductos(): HasMany
+    {
+        return $this->hasMany(CategoriaProducto::class);
+    }
+
     public function pedidos(): HasMany
     {
         return $this->hasMany(Pedido::class);

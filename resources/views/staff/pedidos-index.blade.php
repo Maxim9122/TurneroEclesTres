@@ -23,7 +23,7 @@
         @endforeach
     </div>
 
-    <div class="space-y-3">
+    <div class="space-y-3" x-data="{ modalAbierto: false, formPendiente: null, mensajePendiente: '' }">
         @forelse ($pedidos as $pedido)
             <div class="bg-mate-superficie border border-mate-borde rounded-lg p-4">
                 <div class="flex items-start justify-between gap-3 flex-wrap">
@@ -75,9 +75,7 @@
                             . ($pedido->metodo_entrega === 'retiro' ? 'Podés retirarlo en el local.' : 'Coordinamos el envío a tu domicilio.');
                         $linkWhatsappPedido = \App\Support\WhatsApp::linkChat($pedido->cliente->telefono, $mensajePedido);
                     @endphp
-                    <a href="{{ route('staff.empresa.pedidos.remito', $pedido) }}" target="_blank" class="underline text-mate-salvia">
-                        📄 Enviar remito
-                    </a>
+
                     @if ($linkWhatsappPedido)
                         <a href="{{ $linkWhatsappPedido }}" target="_blank" class="underline text-green-700">
                             📱 Enviar WhatsApp
@@ -85,16 +83,27 @@
                     @else
                         <span class="text-mate-tinta/40 text-xs">Cliente sin teléfono cargado</span>
                     @endif
+
+                    <a href="{{ route('staff.empresa.pedidos.remito', $pedido) }}" target="_blank" class="underline text-mate-salvia">
+                        📄 Enviar remito
+                    </a>
+
                     @if ($pedido->estado === 'pendiente')
                         <form method="POST" action="{{ route('staff.empresa.pedidos.estado', $pedido) }}">
                             @csrf
                             <input type="hidden" name="estado" value="confirmado">
-                            <button class="underline text-green-700">Confirmar</button>
+                            <button type="button" class="underline text-green-700"
+                                @click="modalAbierto = true; formPendiente = $el.closest('form'); mensajePendiente = '¿Confirmar este pedido?'">
+                                Confirmar
+                            </button>
                         </form>
                         <form method="POST" action="{{ route('staff.empresa.pedidos.estado', $pedido) }}">
                             @csrf
                             <input type="hidden" name="estado" value="cancelado">
-                            <button class="underline text-red-700">Cancelar</button>
+                            <button type="button" class="underline text-red-700"
+                                @click="modalAbierto = true; formPendiente = $el.closest('form'); mensajePendiente = '¿Cancelar este pedido? Esta acción no se puede deshacer.'">
+                                Cancelar
+                            </button>
                         </form>
                     @endif
 
@@ -102,7 +111,10 @@
                         <form method="POST" action="{{ route('staff.empresa.pedidos.estado', $pedido) }}">
                             @csrf
                             <input type="hidden" name="estado" value="en_preparacion">
-                            <button class="underline text-blue-700">En preparación</button>
+                            <button type="button" class="underline text-blue-700"
+                                @click="modalAbierto = true; formPendiente = $el.closest('form'); mensajePendiente = '¿Marcar este pedido como en preparación?'">
+                                En preparación
+                            </button>
                         </form>
                     @endif
 
@@ -111,13 +123,19 @@
                             <form method="POST" action="{{ route('staff.empresa.pedidos.estado', $pedido) }}">
                                 @csrf
                                 <input type="hidden" name="estado" value="listo">
-                                <button class="underline text-green-700">Listo para retirar</button>
+                                <button type="button" class="underline text-green-700"
+                                    @click="modalAbierto = true; formPendiente = $el.closest('form'); mensajePendiente = '¿Marcar este pedido como listo para retirar?'">
+                                    Listo para retirar
+                                </button>
                             </form>
                         @else
                             <form method="POST" action="{{ route('staff.empresa.pedidos.estado', $pedido) }}">
                                 @csrf
                                 <input type="hidden" name="estado" value="enviado">
-                                <button class="underline text-blue-700">Marcar enviado</button>
+                                <button type="button" class="underline text-blue-700"
+                                    @click="modalAbierto = true; formPendiente = $el.closest('form'); mensajePendiente = '¿Marcar este pedido como enviado?'">
+                                    Marcar enviado
+                                </button>
                             </form>
                         @endif
                     @endif
@@ -126,7 +144,10 @@
                         <form method="POST" action="{{ route('staff.empresa.pedidos.estado', $pedido) }}">
                             @csrf
                             <input type="hidden" name="estado" value="entregado">
-                            <button class="underline text-green-700">Marcar entregado</button>
+                            <button type="button" class="underline text-green-700"
+                                @click="modalAbierto = true; formPendiente = $el.closest('form'); mensajePendiente = '¿Marcar este pedido como entregado?'">
+                                Marcar entregado
+                            </button>
                         </form>
                     @endif
                 </div>
@@ -134,5 +155,24 @@
         @empty
             <p class="text-sm text-mate-tinta/60">No hay pedidos en este estado.</p>
         @endforelse
+
+        {{-- Modal de confirmación --}}
+        <div x-show="modalAbierto" x-cloak
+            class="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50"
+            style="display: none;">
+            <div @click.outside="modalAbierto = false" class="bg-white rounded-lg max-w-sm w-full p-5">
+                <p class="text-sm mb-5" x-text="mensajePendiente"></p>
+                <div class="flex gap-2">
+                    <button type="button" @click="modalAbierto = false"
+                        class="flex-1 border border-mate-borde rounded-md py-2 text-sm font-medium">
+                        Cancelar
+                    </button>
+                    <button type="button" @click="modalAbierto = false; $nextTick(() => formPendiente.submit())"
+                        class="flex-1 bg-mate-salvia hover:bg-mate-salvia-oscuro text-white rounded-md py-2 text-sm font-medium">
+                        Sí, confirmar
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 </x-layouts.app>

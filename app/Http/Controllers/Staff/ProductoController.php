@@ -12,13 +12,21 @@ use Illuminate\View\View;
 
 class ProductoController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
         $empresa = Auth::guard('web')->user()->empresa;
 
-        $productos = $empresa->productos()->orderBy('nombre')->get();
+        $categoriaId = $request->query('categoria');
 
-        return view('staff.productos-index', compact('productos'));
+        $productos = $empresa->productos()
+            ->when($categoriaId, fn ($q) => $q->where('categoria_id', $categoriaId))
+            ->orderBy('nombre')
+            ->paginate(10)
+            ->withQueryString();
+
+        $categorias = $empresa->categoriasProductos()->orderBy('nombre')->get();
+
+        return view('staff.productos-index', compact('productos', 'categorias', 'categoriaId'));
     }
 
     public function create(): View
@@ -30,7 +38,7 @@ class ProductoController extends Controller
     {
         $empresa = Auth::guard('web')->user()->empresa;
 
-        $data = $this->validarDatos($request);
+        $data = $this->validarDatos($request, $empresa->id);
 
         $producto = $empresa->productos()->create($data);
 
@@ -53,7 +61,7 @@ class ProductoController extends Controller
     {
         $this->autorizar($producto);
 
-        $data = $this->validarDatos($request);
+        $data = $this->validarDatos($request, $producto->empresa_id);
 
         $producto->update($data);
 
@@ -76,7 +84,7 @@ class ProductoController extends Controller
         return back()->with('status', $mensaje);
     }
 
-    private function validarDatos(Request $request): array
+    private function validarDatos(Request $request, int $empresaId): array
     {
         return $request->validate([
             'nombre' => ['required', 'string', 'max:150'],
@@ -84,6 +92,7 @@ class ProductoController extends Controller
             'precio' => ['required', 'numeric', 'min:0'],
             'stock' => ['required', 'integer', 'min:0'],
             'foto' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'categoria_id' => ['nullable', 'exists:categorias_productos,id'],
         ]);
     }
 

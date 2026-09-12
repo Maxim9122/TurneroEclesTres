@@ -59,15 +59,30 @@
         </section>
 
         {{-- Productos --}}
-        @if ($productos->isNotEmpty())
+        @if ($productos->isNotEmpty() || $categoriaId)
             <section class="mb-8">
                 <div class="flex items-center justify-between mb-3">
                     <h2 class="font-display text-lg">Productos</h2>
                     <a href="{{ route('publico.carrito.index', $empresa) }}" class="text-sm text-mate-salvia">Ver carrito →</a>
                 </div>
 
+                @if ($categorias->isNotEmpty())
+                    <div class="flex flex-wrap gap-2 mb-4 text-xs">
+                        <a href="{{ route('publico.empresa', $empresa) }}"
+                            class="px-3 py-1 rounded-full border {{ !$categoriaId ? 'bg-mate-salvia text-white border-mate-salvia' : 'border-mate-borde' }}">
+                            Todas
+                        </a>
+                        @foreach ($categorias as $cat)
+                            <a href="{{ route('publico.empresa', $empresa) }}?categoria={{ $cat->id }}"
+                                class="px-3 py-1 rounded-full border {{ (string) $categoriaId === (string) $cat->id ? 'bg-mate-salvia text-white border-mate-salvia' : 'border-mate-borde' }}">
+                                {{ $cat->nombre }}
+                            </a>
+                        @endforeach
+                    </div>
+                @endif
+
                 <div class="space-y-2">
-                    @foreach ($productos as $producto)
+                    @forelse ($productos as $producto)
                         <div class="flex items-center gap-3 bg-mate-superficie border border-mate-borde rounded-md px-3 py-2.5">
                             @if ($producto->foto_path)
                                 <img src="{{ asset('storage/' . $producto->foto_path) }}" class="w-12 h-12 rounded-md object-cover">
@@ -94,7 +109,13 @@
                                 </form>
                             @endif
                         </div>
-                    @endforeach
+                    @empty
+                        <p class="text-sm text-mate-tinta/60">No hay productos en esta categoría.</p>
+                    @endforelse
+                </div>
+
+                <div class="mt-4">
+                    {{ $productos->onEachSide(1)->links() }}
                 </div>
 
                 @if (session('status'))

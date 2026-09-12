@@ -26,6 +26,8 @@ use App\Http\Controllers\Staff\MiPerfilController;
 use App\Http\Controllers\Staff\PersonasController;
 use App\Http\Controllers\Staff\RemitoController;
 use App\Http\Controllers\Cliente\MiPerfilController as ClienteMiPerfilController;
+use App\Http\Controllers\Staff\CategoriaProductoController;
+use App\Http\Controllers\Staff\RenovacionController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -91,7 +93,7 @@ Route::prefix('staff')->name('staff.')->group(function () {
         Route::middleware(['rol:super_admin'])->group(function () {
             Route::get('/plataforma/dashboard', function () {
                 return view('staff.plataforma-dashboard');
-            })->name('plataforma.dashboard');
+            })->name('plataforma.dashboard');            
 
             // Gestión de empresas registradas
             Route::get('/plataforma/empresas', [EmpresaAdminController::class, 'index'])->name('plataforma.empresas.index');
@@ -126,7 +128,8 @@ Route::prefix('staff')->name('staff.')->group(function () {
             Route::put('/empresa/turnos/{turno}', [TurnoController::class, 'update'])->name('empresa.turnos.update');
             Route::post('/empresa/turnos/{turno}/estado', [TurnoController::class, 'cambiarEstado'])->name('empresa.turnos.estado');
             Route::get('/empresa/turnos/{turno}/remito', [RemitoController::class, 'enviarTurno'])->name('empresa.turnos.remito');
-
+            Route::get('/empresa/renovaciones', [RenovacionController::class, 'index'])->name('empresa.renovaciones.index');
+            
             // Reseteo de contraseña de operador (lo hace un compañero admin, ver abajo en rol:admin también)
             Route::post('/empresa/operadores/{usuario}/password', [OperadorController::class, 'resetearPassword'])->name('empresa.operadores.password');
 
@@ -144,7 +147,11 @@ Route::prefix('staff')->name('staff.')->group(function () {
         // SOLO ADMIN (configuración y gestión del negocio)
         // ==============================
         Route::middleware(['rol:admin'])->group(function () {
-
+            Route::get('/empresa/categorias-productos', [CategoriaProductoController::class, 'index'])->name('empresa.categorias.index');
+            Route::post('/empresa/categorias-productos', [CategoriaProductoController::class, 'store'])->name('empresa.categorias.store');
+            Route::put('/empresa/categorias-productos/{categoria}', [CategoriaProductoController::class, 'update'])->name('empresa.categorias.update');
+            Route::delete('/empresa/categorias-productos/{categoria}', [CategoriaProductoController::class, 'destroy'])->name('empresa.categorias.destroy');
+            
             // Reportes
             Route::get('/empresa/reportes/comisiones', [ReporteController::class, 'comisiones'])->name('empresa.reportes.comisiones');
             Route::get('/empresa/reportes/pedidos', [ReporteController::class, 'pedidos'])->name('empresa.reportes.pedidos');

@@ -10,12 +10,31 @@
         </div>
     @endif
 
-    <a href="{{ route('staff.empresa.productos.create') }}"
-        class="inline-block mb-6 bg-mate-salvia hover:bg-mate-salvia-oscuro text-white rounded-md px-4 py-2.5 text-sm font-medium">
-        + Nuevo producto
-    </a>
+    <div class="flex flex-wrap items-center gap-3 mb-6">
+        <a href="{{ route('staff.empresa.productos.create') }}"
+            class="bg-mate-salvia hover:bg-mate-salvia-oscuro text-white rounded-md px-4 py-2.5 text-sm font-medium">
+            + Nuevo producto
+        </a>
+        <a href="{{ route('staff.empresa.categorias.index') }}"
+            class="border border-mate-borde rounded-md px-4 py-2.5 text-sm font-medium">
+            Gestionar categorías
+        </a>
+    </div>
 
-    <div class="space-y-3">
+    <div class="flex flex-wrap gap-2 mb-6 text-sm">
+        <a href="{{ route('staff.empresa.productos.index') }}"
+            class="px-3 py-1.5 rounded-full border {{ !$categoriaId ? 'bg-mate-salvia text-white border-mate-salvia' : 'border-mate-borde' }}">
+            Todas
+        </a>
+        @foreach ($categorias as $cat)
+            <a href="{{ route('staff.empresa.productos.index', ['categoria' => $cat->id]) }}"
+                class="px-3 py-1.5 rounded-full border {{ (string) $categoriaId === (string) $cat->id ? 'bg-mate-salvia text-white border-mate-salvia' : 'border-mate-borde' }}">
+                {{ $cat->nombre }}
+            </a>
+        @endforeach
+    </div>
+
+    <div class="space-y-3 mb-6">
         @forelse ($productos as $producto)
             <div class="bg-mate-superficie border border-mate-borde rounded-lg p-4 flex items-center justify-between gap-3 flex-wrap">
                 <div class="flex items-center gap-3">
@@ -31,6 +50,9 @@
                             Stock: {{ $producto->stock }}
                             @if ($producto->stock === 0)
                                 <span class="text-red-700">(sin stock)</span>
+                            @endif
+                            @if ($producto->categoria)
+                                · {{ $producto->categoria->nombre }}
                             @endif
                         </p>
                     </div>
@@ -55,7 +77,9 @@
                 </div>
             </div>
         @empty
-            <p class="text-sm text-mate-tinta/60">Todavía no cargaste ningún producto.</p>
+            <p class="text-sm text-mate-tinta/60">No hay productos en esta categoría.</p>
         @endforelse
     </div>
+
+    {{ $productos->links() }}
 </x-layouts.app>

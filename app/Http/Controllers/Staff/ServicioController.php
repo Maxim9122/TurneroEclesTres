@@ -72,6 +72,7 @@ class ServicioController extends Controller
         return $request->validate([
             'nombre' => ['required', 'string', 'max:150'],
             'duracion_minutos' => ['required', 'integer', 'min:5', 'max:600'],
+            'dias_renovacion' => ['nullable', 'integer', 'min:1', 'max:365'],
             'precio' => ['required', 'numeric', 'min:0'],
         ]);
     }

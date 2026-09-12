@@ -12,7 +12,7 @@ class Servicio extends Model
     use HasFactory;
 
     protected $fillable = [
-        'empresa_id', 'nombre', 'duracion_minutos', 'precio', 'activo',
+        'empresa_id', 'nombre', 'duracion_minutos', 'dias_renovacion', 'precio', 'activo',
     ];
 
     protected function casts(): array

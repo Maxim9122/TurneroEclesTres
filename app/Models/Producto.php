@@ -11,7 +11,7 @@ class Producto extends Model
     use HasFactory;
 
     protected $fillable = [
-        'empresa_id', 'nombre', 'descripcion', 'precio', 'stock', 'foto_path', 'activo',
+        'empresa_id', 'categoria_id', 'nombre', 'descripcion', 'precio', 'stock', 'foto_path', 'activo',
     ];
 
     protected function casts(): array
@@ -30,5 +30,10 @@ class Producto extends Model
     public function hayStock(int $cantidad = 1): bool
     {
         return $this->stock >= $cantidad;
+    }
+
+    public function categoria(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(CategoriaProducto::class, 'categoria_id');
     }
 }
