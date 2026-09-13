@@ -19,6 +19,7 @@ class ProductoController extends Controller
         $categoriaId = $request->query('categoria');
 
         $productos = $empresa->productos()
+            ->with('imagenes')
             ->when($categoriaId, fn ($q) => $q->where('categoria_id', $categoriaId))
             ->orderBy('nombre')
             ->paginate(10)
@@ -38,13 +39,15 @@ class ProductoController extends Controller
     {
         $empresa = Auth::guard('web')->user()->empresa;
 
-        $data = $this->validarDatos($request, $empresa->id);
+        $data = $this->validarDatos($request);
 
         $producto = $empresa->productos()->create($data);
 
         if ($request->hasFile('foto')) {
-            $this->guardarFoto($producto, $request);
+            $this->guardarFotoPrincipal($producto, $request);
         }
+
+        $this->guardarImagenesAdicionales($producto, $request);
 
         return redirect()->route('staff.empresa.productos.index')
             ->with('status', 'Producto creado correctamente.');
@@ -54,6 +57,8 @@ class ProductoController extends Controller
     {
         $this->autorizar($producto);
 
+        $producto->load('imagenes');
+
         return view('staff.productos-edit', compact('producto'));
     }
 
@@ -61,16 +66,28 @@ class ProductoController extends Controller
     {
         $this->autorizar($producto);
 
-        $data = $this->validarDatos($request, $producto->empresa_id);
+        $data = $this->validarDatos($request);
 
         $producto->update($data);
 
         if ($request->hasFile('foto')) {
-            $this->guardarFoto($producto, $request);
+            $this->guardarFotoPrincipal($producto, $request);
         }
+
+        $this->guardarImagenesAdicionales($producto, $request);
 
         return redirect()->route('staff.empresa.productos.index')
             ->with('status', 'Producto actualizado correctamente.');
+    }
+
+    public function eliminarImagen(\App\Models\ProductoImagen $imagen): RedirectResponse
+    {
+        $this->autorizar($imagen->producto);
+
+        Storage::disk('public')->delete($imagen->path);
+        $imagen->delete();
+
+        return back()->with('status', 'Imagen eliminada.');
     }
 
     public function alternarEstado(Producto $producto): RedirectResponse
@@ -84,7 +101,7 @@ class ProductoController extends Controller
         return back()->with('status', $mensaje);
     }
 
-    private function validarDatos(Request $request, int $empresaId): array
+    private function validarDatos(Request $request): array
     {
         return $request->validate([
             'nombre' => ['required', 'string', 'max:150'],
@@ -92,11 +109,12 @@ class ProductoController extends Controller
             'precio' => ['required', 'numeric', 'min:0'],
             'stock' => ['required', 'integer', 'min:0'],
             'foto' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'imagenes_adicionales.*' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
             'categoria_id' => ['nullable', 'exists:categorias_productos,id'],
         ]);
     }
 
-    private function guardarFoto(Producto $producto, Request $request): void
+    private function guardarFotoPrincipal(Producto $producto, Request $request): void
     {
         $carpeta = "productos/{$producto->id}";
 
@@ -109,6 +127,31 @@ class ProductoController extends Controller
         $extension = $request->file('foto')->getClientOriginalExtension();
         $producto->foto_path = $request->file('foto')->storeAs($carpeta, "foto.{$extension}", 'public');
         $producto->save();
+    }
+
+    /**
+     * Agrega imágenes adicionales, respetando el máximo de 3 imágenes totales
+     * (principal + adicionales) por producto.
+     */
+    private function guardarImagenesAdicionales(Producto $producto, Request $request): void
+    {
+        if (!$request->hasFile('imagenes_adicionales')) {
+            return;
+        }
+
+        $carpeta = "productos/{$producto->id}";
+        $yaExistentes = $producto->imagenes()->count() + ($producto->foto_path ? 1 : 0);
+        $espacioDisponible = max(0, 3 - $yaExistentes);
+
+        foreach (array_slice($request->file('imagenes_adicionales'), 0, $espacioDisponible) as $index => $archivo) {
+            $nombre = uniqid('img_') . '.' . $archivo->getClientOriginalExtension();
+            $ruta = $archivo->storeAs($carpeta, $nombre, 'public');
+
+            $producto->imagenes()->create([
+                'path' => $ruta,
+                'orden' => $producto->imagenes()->count(),
+            ]);
+        }
     }
 
     private function autorizar(Producto $producto): void

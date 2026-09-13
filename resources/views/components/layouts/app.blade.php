@@ -38,23 +38,31 @@
         </nav>
     </header>
 
-        @auth('web')
-        @php $empresaActual = auth('web')->user()->empresa; @endphp
-        @if ($empresaActual)
-            <div style="{{ $empresaActual->fondoCss() }}">
-                <div class="bg-black/15 px-4 py-4 sm:px-6 flex items-center gap-3">
-                    @if ($empresaActual->logo_path)
-                        <img src="{{ asset('storage/' . $empresaActual->logo_path) }}"
-                            class="w-10 h-10 rounded-full object-cover bg-white shadow shrink-0">
-                    @endif
-                    <div>
-                        <p class="text-white font-display text-base leading-tight drop-shadow">{{ $empresaActual->nombre }}</p>
-                        <p class="text-white/80 text-xs">{{ ucfirst($empresaActual->rubro) }}</p>
+       @auth('web')
+            @php
+                $empresaActual = auth('web')->user()->empresa;
+                $direccionActual = $empresaActual?->direcciones->first();
+            @endphp
+            @if ($empresaActual)
+                <div style="{{ $empresaActual->fondoCss() }}">
+                    <div class="bg-black/15 px-4 py-4 sm:px-6 flex items-center gap-3">
+                        @if ($empresaActual->logo_path)
+                            <img src="{{ asset('storage/' . $empresaActual->logo_path) }}"
+                                class="w-10 h-10 rounded-full object-cover bg-white shadow shrink-0">
+                        @endif
+                        <div class="min-w-0">
+                            <p class="text-white font-display text-base leading-tight drop-shadow truncate">{{ $empresaActual->nombre }}</p>
+                            <p class="text-white/80 text-xs truncate">
+                                {{ ucfirst($empresaActual->rubro) }}
+                                @if ($direccionActual && $direccionActual->ciudad)
+                                    · {{ $direccionActual->barrio }}{{ $direccionActual->barrio && $direccionActual->ciudad ? ', ' : '' }}{{ $direccionActual->ciudad }}
+                                @endif
+                            </p>
+                        </div>
                     </div>
                 </div>
-            </div>
-        @endif
-    @endauth
+            @endif
+        @endauth
 
     <main class="px-4 py-6 sm:px-6 max-w-5xl mx-auto">
         {{ $slot }}

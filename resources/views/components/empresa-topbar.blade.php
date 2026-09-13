@@ -1,5 +1,9 @@
 @props(['empresa', 'backRoute' => null, 'backLabel' => null])
 
+@php
+    $direccion = $empresa->direcciones->first();
+@endphp
+
 <div style="{{ $empresa->fondoCss() }}">
     <div class="bg-black/15 px-4 py-4 sm:px-6 flex items-center gap-3">
         @if ($backRoute)
@@ -13,7 +17,11 @@
 
         <div class="min-w-0">
             <p class="text-white font-display text-base leading-tight drop-shadow truncate">{{ $empresa->nombre }}</p>
-            @if ($backLabel)
+            @if ($direccion && $direccion->ciudad)
+                <p class="text-white/80 text-xs truncate">
+                    {{ $direccion->barrio }}{{ $direccion->barrio && $direccion->ciudad ? ', ' : '' }}{{ $direccion->ciudad }}
+                </p>
+            @elseif ($backLabel)
                 <p class="text-white/80 text-xs">{{ $backLabel }}</p>
             @endif
         </div>

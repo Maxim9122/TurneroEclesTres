@@ -60,3 +60,31 @@
         @endif
     @endisset
 </div>
+
+<div>
+    <label class="block text-sm mb-1">Fotos adicionales (opcional, hasta 2 más)</label>
+    <input type="file" name="imagenes_adicionales[]" accept="image/*" multiple
+        class="w-full text-sm file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:bg-mate-salvia file:text-white text-mate-tinta/70">
+    <p class="text-xs text-mate-tinta/50 mt-1">El producto puede tener hasta 3 fotos en total.</p>
+
+    @isset($producto)
+        @if ($producto->imagenes->isNotEmpty())
+            <div class="flex gap-2 mt-2">
+                @foreach ($producto->imagenes as $imagen)
+                    <div class="relative">
+                        <img src="{{ asset('storage/' . $imagen->path) }}" class="w-16 h-16 rounded-md object-cover">
+                        <button type="submit" form="eliminar-imagen-{{ $imagen->id }}"
+                            class="absolute -top-1.5 -right-1.5 bg-red-600 text-white text-xs w-5 h-5 rounded-full">×</button>
+                    </div>
+                @endforeach
+            </div>
+            @foreach ($producto->imagenes as $imagen)
+                <form id="eliminar-imagen-{{ $imagen->id }}" method="POST"
+                    action="{{ route('staff.empresa.productos.imagenes.eliminar', $imagen) }}" class="hidden">
+                    @csrf
+                    @method('DELETE')
+                </form>
+            @endforeach
+        @endif
+    @endisset
+</div>

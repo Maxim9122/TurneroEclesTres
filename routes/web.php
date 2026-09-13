@@ -157,6 +157,7 @@ Route::prefix('staff')->name('staff.')->group(function () {
             Route::get('/empresa/reportes/pedidos', [ReporteController::class, 'pedidos'])->name('empresa.reportes.pedidos');
 
             // Productos
+            Route::delete('/empresa/productos/imagenes/{imagen}', [ProductoController::class, 'eliminarImagen'])->name('empresa.productos.imagenes.eliminar');
             Route::get('/empresa/productos', [ProductoController::class, 'index'])->name('empresa.productos.index');
             Route::get('/empresa/productos/nuevo', [ProductoController::class, 'create'])->name('empresa.productos.create');
             Route::post('/empresa/productos', [ProductoController::class, 'store'])->name('empresa.productos.store');

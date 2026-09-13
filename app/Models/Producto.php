@@ -36,4 +36,29 @@ class Producto extends Model
     {
         return $this->belongsTo(CategoriaProducto::class, 'categoria_id');
     }
+
+    public function imagenes(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(ProductoImagen::class)->orderBy('orden');
+    }
+
+    /**
+     * Devuelve hasta 3 rutas de imagen para mostrar: la principal (foto_path)
+     * primero si existe, seguida de las adicionales cargadas en producto_imagenes.
+     */
+    public function todasLasImagenes(): array
+    {
+        $rutas = [];
+
+        if ($this->foto_path) {
+            $rutas[] = $this->foto_path;
+        }
+
+        foreach ($this->imagenes as $imagen) {
+            if (count($rutas) >= 3) break;
+            $rutas[] = $imagen->path;
+        }
+
+        return $rutas;
+    }
 }

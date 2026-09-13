@@ -6,18 +6,49 @@
     <title>{{ $empresa->nombre }} - EclesTres</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        html { overflow-anchor: none; }
+    </style>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    
 </head>
 <body class="min-h-screen bg-mate-fondo font-body">
 
-    <div style="{{ $empresa->fondoCss() }}">
-        <div class="bg-black/15 px-5 py-12 flex flex-col items-center text-center gap-3">
+    @php $direccionEmpresa = $empresa->direcciones->first(); @endphp
+
+    <div
+            x-data="{ achicado: false }"
+            @scroll.window="
+                if (!achicado && window.scrollY > 100) achicado = true;
+                if (achicado && window.scrollY < 40) achicado = false;
+            "
+            style="{{ $empresa->fondoCss() }}"
+            class="sticky top-0 z-30 transition-all duration-300"
+        >
+        <div class="bg-black/15 flex flex-col items-center text-center transition-all duration-300"
+            :class="achicado ? 'px-4 py-2 flex-row justify-center gap-2' : 'px-5 py-12 gap-3'">
+
             @if ($empresa->logo_path)
                 <img src="{{ asset('storage/' . $empresa->logo_path) }}"
-                    class="w-20 h-20 rounded-full object-cover bg-white shadow">
+                    class="rounded-full object-cover bg-white shadow transition-all duration-300"
+                    :class="achicado ? 'w-8 h-8' : 'w-20 h-20'">
             @endif
-            <h1 class="font-display text-2xl text-white drop-shadow">{{ $empresa->nombre }}</h1>
-            <p class="text-sm text-white/90">{{ ucfirst($empresa->rubro) }}</p>
+
+            <div :class="achicado ? 'text-left' : 'text-center'">
+                <h1 class="font-display text-white drop-shadow transition-all duration-300"
+                    :class="achicado ? 'text-sm' : 'text-2xl'">
+                    {{ $empresa->nombre }}
+                </h1>
+
+                <div x-show="!achicado" x-collapse>
+                    <p class="text-sm text-white/90">{{ ucfirst($empresa->rubro) }}</p>
+                    @if ($direccionEmpresa && $direccionEmpresa->ciudad)
+                        <p class="text-xs text-white/80">
+                            {{ $direccionEmpresa->barrio }}{{ $direccionEmpresa->barrio && $direccionEmpresa->ciudad ? ', ' : '' }}{{ $direccionEmpresa->ciudad }}
+                        </p>
+                    @endif
+                </div>
+            </div>
         </div>
     </div>
 
@@ -84,11 +115,15 @@
                 <div class="space-y-2">
                     @forelse ($productos as $producto)
                         <div class="flex items-center gap-3 bg-mate-superficie border border-mate-borde rounded-md px-3 py-2.5">
-                            @if ($producto->foto_path)
-                                <img src="{{ asset('storage/' . $producto->foto_path) }}" class="w-12 h-12 rounded-md object-cover">
-                            @else
-                                <div class="w-12 h-12 rounded-md bg-mate-borde"></div>
-                            @endif
+                            <x-galeria-modal :imagenes="$producto->todasLasImagenes()" :nombre="$producto->nombre">
+                                <div class="w-12 h-12 rounded-md overflow-hidden">
+                                    @if ($producto->foto_path)
+                                        <img src="{{ asset('storage/' . $producto->foto_path) }}" class="w-full h-full object-cover">
+                                    @else
+                                        <div class="w-full h-full bg-mate-borde"></div>
+                                    @endif
+                                </div>
+                            </x-galeria-modal>
 
                             <div class="flex-1">
                                 <p class="text-sm font-medium">{{ $producto->nombre }}</p>
