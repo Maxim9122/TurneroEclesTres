@@ -4,11 +4,17 @@ namespace App\Http\Controllers\Publico;
 
 use App\Http\Controllers\Controller;
 use App\Models\Empresa;
+use App\Services\CarritoService;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class EmpresaPublicaController extends Controller
 {
-    public function show(Empresa $empresa, \Illuminate\Http\Request $request): View
+    public function __construct(private CarritoService $carrito)
+    {
+    }
+
+    public function show(Empresa $empresa, Request $request): View
     {
         if (!$empresa->estaActiva()) {
             abort(404);
@@ -30,6 +36,10 @@ class EmpresaPublicaController extends Controller
             ->paginate(10)
             ->withQueryString();
 
-        return view('publico.empresa', compact('empresa', 'servicios', 'profesionales', 'productos', 'categorias', 'categoriaId'));
+        $cantidadCarrito = $this->carrito->cantidadTotal($empresa->id);
+
+        return view('publico.empresa', compact(
+            'empresa', 'servicios', 'profesionales', 'productos', 'categorias', 'categoriaId', 'cantidadCarrito'
+        ));
     }
 }

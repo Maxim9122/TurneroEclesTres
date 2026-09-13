@@ -44,8 +44,9 @@ class CarritoController extends Controller
         })->filter()->values();
 
         $total = $lineas->sum('subtotal');
+        $cantidadCarrito = $this->carrito->cantidadTotal($empresa->id);
 
-        return view('publico.carrito', compact('empresa', 'lineas', 'total'));
+        return view('publico.carrito', compact('empresa', 'lineas', 'total', 'cantidadCarrito'));
     }
 
     public function agregar(Request $request, Empresa $empresa): RedirectResponse

@@ -174,5 +174,6 @@
         </p>
     </main>
     <x-footer />
+    <x-carrito-flotante :empresa="$empresa" :cantidad="$cantidadCarrito" />
 </body>
 </html>
