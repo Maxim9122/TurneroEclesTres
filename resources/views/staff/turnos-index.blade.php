@@ -48,9 +48,9 @@
 
                 <div class="flex flex-wrap gap-2 mt-3 text-sm">
                     @php
-                        $mensajeTurno = "Hola {$turno->cliente->nombre}! Te confirmamos tu turno en {$turno->empresa->nombre} "
-                            . "para el {$turno->fecha->format('d/m/Y')} a las " . substr($turno->hora_inicio, 0, 5) . "hs. "
-                            . "Servicios: " . $turno->servicios->pluck('nombre')->implode(' + ') . ". ¡Te esperamos!";
+                        $mensajeTurno = "Hola {$turno->cliente->nombre}! Te confirmamos tu turno en {$turno->empresa->nombre} (EclesTres) "
+                        . "para el {$turno->fecha->format('d/m/Y')} a las " . substr($turno->hora_inicio, 0, 5) . "hs. "
+                        . "Servicios: " . $turno->servicios->pluck('nombre')->implode(' + ') . ". ¡Te esperamos!";
                         $linkWhatsapp = \App\Support\WhatsApp::linkChat($turno->cliente->telefono, $mensajeTurno);
                     @endphp
 
@@ -62,13 +62,15 @@
                         <span class="text-mate-tinta/40 text-xs">Cliente sin teléfono cargado</span>
                     @endif
 
-                    <a href="{{ route('staff.empresa.turnos.remito', $turno) }}" target="_blank" class="underline text-mate-salvia">
-                        📄 Enviar comprobante
-                    </a>
+                    @unless (in_array($turno->estado, ['cancelado', 'no_show']))
+                        <a href="{{ route('staff.empresa.turnos.remito', $turno) }}" target="_blank" class="underline text-mate-salvia">
+                            📄 Enviar comprobante
+                        </a>
 
-                    <a href="{{ route('staff.empresa.turnos.edit', $turno) }}" class="underline text-mate-tinta/70">
-                        Editar profesional/servicios
-                    </a>
+                        <a href="{{ route('staff.empresa.turnos.edit', $turno) }}" class="underline text-mate-tinta/70">
+                            Editar profesional/servicios
+                        </a>
+                    @endunless
 
                     @if ($turno->estado === 'pendiente')
                         <form method="POST" action="{{ route('staff.empresa.turnos.estado', $turno) }}">

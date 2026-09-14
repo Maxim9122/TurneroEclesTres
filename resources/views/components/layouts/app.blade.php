@@ -12,7 +12,9 @@
 
     <header class="bg-mate-superficie border-b border-mate-borde">
         <div class="flex items-center justify-between px-4 py-3 sm:px-6">
-            <x-brand size="text-xl" />
+            <a href="{{ route('home') }}" title="Ir al sitio principal">
+                <x-brand size="text-xl" />
+            </a>
 
             <button @click="menuAbierto = !menuAbierto" class="sm:hidden p-2" aria-label="Abrir menú">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-mate-tinta" fill="none" viewBox="0 0 24 24" stroke="currentColor">

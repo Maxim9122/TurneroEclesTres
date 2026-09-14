@@ -16,8 +16,13 @@
             Ver turnos de hoy
         </a>
         <a href="{{ route('staff.empresa.renovaciones.index') }}"
-            class="inline-block border border-mate-borde rounded-md px-4 py-2.5 text-sm font-medium">
+            class="relative inline-block border border-mate-borde rounded-md px-4 py-2.5 text-sm font-medium">
             Próximas renovaciones
+            @if ($cantidadRenovaciones > 0)
+                <span class="absolute -top-2 -right-2 bg-green-600 text-white text-xs font-medium rounded-full w-5 h-5 flex items-center justify-center">
+                    {{ $cantidadRenovaciones }}
+                </span>
+            @endif
         </a>
         <a href="{{ route('staff.empresa.pedidos.index') }}"
             class="inline-block border border-mate-borde rounded-md px-4 py-2.5 text-sm font-medium">

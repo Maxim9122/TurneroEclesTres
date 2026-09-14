@@ -18,6 +18,9 @@
     <div class="space-y-3">
         @forelse ($servicios as $servicio)
             <div class="bg-mate-superficie border border-mate-borde rounded-lg p-4 flex items-center justify-between gap-3">
+                @if ($servicio->foto_path)
+                    <img src="{{ asset('storage/' . $servicio->foto_path) }}" class="w-12 h-12 rounded-md object-cover">
+                @endif
                 <div>
                     <p class="font-medium text-sm">{{ $servicio->nombre }}</p>
                     <p class="text-xs text-mate-tinta/60">

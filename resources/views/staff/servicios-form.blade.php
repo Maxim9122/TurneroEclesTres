@@ -41,6 +41,47 @@
     </p>
 </div>
 
+<div>
+    <label class="block text-sm mb-1">Foto principal (opcional)</label>
+    <input type="file" name="foto" accept="image/*"
+        class="w-full text-sm file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:bg-mate-salvia file:text-white text-mate-tinta/70">
+    @isset($servicio)
+        @if ($servicio->foto_path)
+            <img src="{{ asset('storage/' . $servicio->foto_path) }}" class="w-16 h-16 rounded-md object-cover mt-2">
+        @endif
+    @endisset
+</div>
+
+<div>
+    <label class="block text-sm mb-1">Fotos adicionales (opcional, hasta 2 más)</label>
+    <input type="file" name="imagenes_adicionales[]" accept="image/*" multiple
+        class="w-full text-sm file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:bg-mate-salvia file:text-white text-mate-tinta/70">
+    <p class="text-xs text-mate-tinta/50 mt-1">El servicio puede tener hasta 3 fotos en total.</p>
+
+    @isset($servicio)
+        @if ($servicio->imagenes->isNotEmpty())
+            <div class="flex gap-2 mt-2">
+                @foreach ($servicio->imagenes as $imagen)
+                    <div class="relative">
+                        <img src="{{ asset('storage/' . $imagen->path) }}" class="w-16 h-16 rounded-md object-cover">
+                        <button type="submit" form="eliminar-imagen-serv-{{ $imagen->id }}"
+                            class="absolute -top-1.5 -right-1.5 bg-red-600 text-white text-xs w-5 h-5 rounded-full">×</button>
+                    </div>
+                @endforeach
+            </div>
+        @endif
+    @endisset
+</div>
+
+@php
+    $rubroActual = \Illuminate\Support\Facades\Auth::guard('web')->user()->empresa->rubro;
+    $ejemploCombo = match ($rubroActual) {
+        'peluqueria', 'barberia' => 'Si un cliente quiere "Corte + Barba", va a poder elegir ambos servicios por separado al reservar',
+        'estetica', 'unas' => 'Si un cliente quiere combinar servicios (ej: "Manicura + Pedicura"), va a poder elegirlos por separado al reservar',
+        'salud' => 'Si un cliente necesita varias prácticas en la misma consulta, va a poder elegirlas por separado al reservar',
+        default => 'Si un cliente quiere combinar varios de tus servicios, va a poder elegirlos por separado al reservar',
+    };
+@endphp
 <p class="text-xs text-mate-tinta/50">
-    Si un cliente quiere "Degradé + Barba", va a poder elegir ambos servicios por separado al reservar — no hace falta cargarlos como combo.
+    {{ $ejemploCombo }} — no hace falta cargarlos como combo.
 </p>

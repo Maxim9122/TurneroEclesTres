@@ -78,13 +78,6 @@
                     </div>
                 @endforeach
             </div>
-            @foreach ($producto->imagenes as $imagen)
-                <form id="eliminar-imagen-{{ $imagen->id }}" method="POST"
-                    action="{{ route('staff.empresa.productos.imagenes.eliminar', $imagen) }}" class="hidden">
-                    @csrf
-                    @method('DELETE')
-                </form>
-            @endforeach
         @endif
     @endisset
 </div>

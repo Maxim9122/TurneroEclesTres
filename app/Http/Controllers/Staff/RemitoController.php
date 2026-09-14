@@ -21,7 +21,7 @@ class RemitoController extends Controller
 
         $url = URL::temporarySignedRoute('remitos.pedido', now()->addDays(30), ['pedido' => $pedido->id]);
 
-        $mensaje = "Acá tenés tu remito de compra en {$pedido->empresa->nombre}:\n{$url}";
+        $mensaje = "Acá tenés tu remito de compra en {$pedido->empresa->nombre} (EclesTres):\n{$url}";
 
         $link = WhatsApp::linkChat($pedido->cliente->telefono, $mensaje);
 
@@ -38,7 +38,7 @@ class RemitoController extends Controller
 
         $url = URL::temporarySignedRoute('remitos.turno', now()->addDays(30), ['turno' => $turno->id]);
 
-        $mensaje = "Acá tenés tu comprobante de turno en {$turno->empresa->nombre}:\n{$url}";
+        $mensaje = "Acá tenés tu comprobante de turno en {$turno->empresa->nombre} (EclesTres):\n{$url}";
 
         $link = WhatsApp::linkChat($turno->cliente->telefono, $mensaje);
 

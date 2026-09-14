@@ -70,9 +70,9 @@
                 <div class="flex flex-wrap gap-2 mt-3 text-sm">
                     @php
                         $itemsTexto = $pedido->items->map(fn ($item) => "{$item->cantidad}x {$item->producto->nombre}")->implode(', ');
-                        $mensajePedido = "Hola {$pedido->cliente->nombre}! Te confirmamos tu pedido en {$pedido->empresa->nombre}: "
-                            . $itemsTexto . ". Total: \${$pedido->total}. "
-                            . ($pedido->metodo_entrega === 'retiro' ? 'Podés retirarlo en el local.' : 'Coordinamos el envío a tu domicilio.');
+                        $mensajePedido = "Hola {$pedido->cliente->nombre}! Te confirmamos tu pedido en {$pedido->empresa->nombre} (EclesTres): "
+                        . $itemsTexto . ". Total: \${$pedido->total}. "
+                        . ($pedido->metodo_entrega === 'retiro' ? 'Podés retirarlo en el local.' : 'Coordinamos el envío a tu domicilio.');
                         $linkWhatsappPedido = \App\Support\WhatsApp::linkChat($pedido->cliente->telefono, $mensajePedido);
                     @endphp
 

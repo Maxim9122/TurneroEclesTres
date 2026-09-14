@@ -11,9 +11,9 @@
     <div class="space-y-2 mb-10">
         @forelse ($proximas as $item)
             @php
-                $mensaje = "Hola {$item->cliente_nombre}! Te escribimos de EclesTres para recordarte que ya se acerca "
-                    . "el momento de renovar tu {$item->servicio_nombre} (aprox. " . \Carbon\Carbon::parse($item->fecha_renovacion)->format('d/m/Y') . "). "
-                    . "¿Querés que te reservemos un turno?";
+                $mensaje = "Hola {$item->cliente_nombre}! Te escribimos de {$item->empresa_nombre} (EclesTres) para recordarte que ya se acerca "
+                . "el momento de renovar tu {$item->servicio_nombre} (aprox. " . \Carbon\Carbon::parse($item->fecha_renovacion)->format('d/m/Y') . "). "
+                . "¿Querés que te reservemos un turno?";
                 $link = \App\Support\WhatsApp::linkChat($item->cliente_telefono, $mensaje);
             @endphp
             <div class="bg-mate-superficie border border-mate-borde rounded-md p-3 flex items-center justify-between gap-3 flex-wrap">
@@ -25,13 +25,20 @@
                     </p>
                 </div>
 
-                @if ($link)
-                    <a href="{{ $link }}" target="_blank" class="text-xs bg-mate-salvia text-white rounded-md px-3 py-1.5">
-                        📱 Avisar por WhatsApp
+                <div class="flex gap-2">
+                    <a href="{{ route('staff.empresa.turnos.manual.iniciar', ['cliente_id' => $item->cliente_id, 'servicio_id' => $item->servicio_id]) }}"
+                        class="text-xs bg-mate-salvia text-white rounded-md px-3 py-1.5">
+                        📅 Agendar turno
                     </a>
-                @else
-                    <span class="text-xs text-mate-tinta/40">Sin teléfono</span>
-                @endif
+
+                    @if ($link)
+                        <a href="{{ $link }}" target="_blank" class="text-xs bg-green-600 text-white rounded-md px-3 py-1.5">
+                            📱 Avisar por WhatsApp
+                        </a>
+                    @else
+                        <span class="text-xs text-mate-tinta/40">Sin teléfono</span>
+                    @endif
+                </div>
             </div>
         @empty
             <p class="text-sm text-mate-tinta/60">No hay renovaciones próximas en los próximos 5 días.</p>

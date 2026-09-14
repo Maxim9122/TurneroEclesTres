@@ -4,7 +4,7 @@
         <a href="{{ route('staff.empresa.servicios.index') }}" class="text-sm text-mate-salvia">Volver</a>
     </div>
 
-    <form method="POST" action="{{ route('staff.empresa.servicios.store') }}"
+    <form method="POST" action="{{ route('staff.empresa.servicios.store') }}" enctype="multipart/form-data"
         class="bg-mate-superficie border border-mate-borde rounded-lg p-5 space-y-4 max-w-md">
         @csrf
         @include('staff.servicios-form')

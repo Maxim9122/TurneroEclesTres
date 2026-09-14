@@ -4,7 +4,7 @@
         <a href="{{ route('staff.empresa.servicios.index') }}" class="text-sm text-mate-salvia">Volver</a>
     </div>
 
-    <form method="POST" action="{{ route('staff.empresa.servicios.update', $servicio) }}"
+    <form method="POST" action="{{ route('staff.empresa.servicios.update', $servicio) }}" enctype="multipart/form-data"
         class="bg-mate-superficie border border-mate-borde rounded-lg p-5 space-y-4 max-w-md">
         @csrf
         @method('PUT')
@@ -15,4 +15,14 @@
             Guardar cambios
         </button>
     </form>
+    {{-- Formularios ocultos para eliminar imágenes --}}
+    @if ($servicio->imagenes->isNotEmpty())
+        @foreach ($servicio->imagenes as $imagen)
+            <form id="eliminar-imagen-serv-{{ $imagen->id }}" method="POST"
+                action="{{ route('staff.empresa.servicios.imagenes.eliminar', $imagen) }}" class="hidden">
+                @csrf
+                @method('DELETE')
+            </form>
+        @endforeach
+    @endif
 </x-layouts.app>

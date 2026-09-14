@@ -79,6 +79,17 @@
                             <span class="flex items-center gap-2 text-sm">
                                 <input type="checkbox" class="rounded border-mate-borde"
                                     @change="toggleServicio({{ $servicio->id }})">
+
+                                @if ($servicio->todasLasImagenes())
+                                    <span onclick="event.preventDefault()">
+                                        <x-galeria-modal :imagenes="$servicio->todasLasImagenes()" :nombre="$servicio->nombre">
+                                            <div class="w-8 h-8 rounded-md overflow-hidden shrink-0">
+                                                <img src="{{ asset('storage/' . $servicio->todasLasImagenes()[0]) }}" class="w-full h-full object-cover">
+                                            </div>
+                                        </x-galeria-modal>
+                                    </span>
+                                @endif
+
                                 {{ $servicio->nombre }}
                                 <span class="text-xs text-mate-tinta/50">({{ $servicio->duracion_minutos }} min)</span>
                             </span>

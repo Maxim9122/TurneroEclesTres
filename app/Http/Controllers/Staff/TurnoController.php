@@ -34,6 +34,8 @@ class TurnoController extends Controller
     {
         $this->autorizar($turno);
 
+        abort_if(in_array($turno->estado, ['cancelado', 'no_show']), 403, 'Este turno ya no se puede editar.');
+
         $empresa = $turno->empresa;
         $profesionales = $empresa->profesionales()->where('activo', true)->orderBy('nombre')->get();
         $servicios = $empresa->servicios()->where('activo', true)->orderBy('nombre')->get();
@@ -45,6 +47,8 @@ class TurnoController extends Controller
     public function update(Request $request, Turno $turno): RedirectResponse
     {
         $this->autorizar($turno);
+
+         abort_if(in_array($turno->estado, ['cancelado', 'no_show']), 403, 'Este turno ya no se puede editar.');
 
         $data = $request->validate([
             'profesional_id' => ['nullable', 'exists:profesionales,id'],

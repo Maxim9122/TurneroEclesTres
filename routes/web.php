@@ -28,6 +28,7 @@ use App\Http\Controllers\Staff\RemitoController;
 use App\Http\Controllers\Cliente\MiPerfilController as ClienteMiPerfilController;
 use App\Http\Controllers\Staff\CategoriaProductoController;
 use App\Http\Controllers\Staff\RenovacionController;
+use App\Http\Controllers\Staff\TurnoManualController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -94,7 +95,7 @@ Route::prefix('staff')->name('staff.')->group(function () {
             Route::get('/plataforma/dashboard', function () {
                 return view('staff.plataforma-dashboard');
             })->name('plataforma.dashboard');            
-
+            
             // Gestión de empresas registradas
             Route::get('/plataforma/empresas', [EmpresaAdminController::class, 'index'])->name('plataforma.empresas.index');
             Route::post('/plataforma/empresas/{empresa}/activar', [EmpresaAdminController::class, 'activar'])->name('plataforma.empresas.activar');
@@ -114,7 +115,17 @@ Route::prefix('staff')->name('staff.')->group(function () {
         // ==============================
         Route::middleware(['rol:admin,operador'])->group(function () {
             Route::get('/empresa/dashboard', function () {
-                return view('staff.empresa-dashboard');
+                $empresaId = auth('web')->user()->empresa_id;
+                $hoy = now()->toDateString();
+                $limite = now()->addDays(5)->toDateString();
+
+                $cantidadRenovaciones = \Illuminate\Support\Facades\DB::table('turno_servicios')
+                    ->join('turnos', 'turnos.id', '=', 'turno_servicios.turno_id')
+                    ->where('turnos.empresa_id', $empresaId)
+                    ->whereBetween('turno_servicios.fecha_renovacion', [$hoy, $limite])
+                    ->count();
+
+                return view('staff.empresa-dashboard', compact('cantidadRenovaciones'));
             })->name('empresa.dashboard');
 
             // Pedidos
@@ -123,6 +134,8 @@ Route::prefix('staff')->name('staff.')->group(function () {
             Route::get('/empresa/pedidos/{pedido}/remito', [RemitoController::class, 'enviarPedido'])->name('empresa.pedidos.remito');
 
             // Turnos
+            Route::get('/empresa/turnos/nuevo-manual', [TurnoManualController::class, 'iniciar'])->name('empresa.turnos.manual.iniciar');
+            Route::post('/empresa/turnos/nuevo-manual', [TurnoManualController::class, 'confirmar'])->name('empresa.turnos.manual.confirmar');
             Route::get('/empresa/turnos', [TurnoController::class, 'index'])->name('empresa.turnos.index');
             Route::get('/empresa/turnos/{turno}/editar', [TurnoController::class, 'edit'])->name('empresa.turnos.edit');
             Route::put('/empresa/turnos/{turno}', [TurnoController::class, 'update'])->name('empresa.turnos.update');
@@ -180,6 +193,7 @@ Route::prefix('staff')->name('staff.')->group(function () {
             Route::post('/empresa/operadores/{usuario}/alternar', [OperadorController::class, 'alternarEstado'])->name('empresa.operadores.alternar');
 
             // Gestión de servicios
+            Route::delete('/empresa/servicios/imagenes/{imagen}', [ServicioController::class, 'eliminarImagen'])->name('empresa.servicios.imagenes.eliminar');
             Route::get('/empresa/servicios', [ServicioController::class, 'index'])->name('empresa.servicios.index');
             Route::get('/empresa/servicios/nuevo', [ServicioController::class, 'create'])->name('empresa.servicios.create');
             Route::post('/empresa/servicios', [ServicioController::class, 'store'])->name('empresa.servicios.store');
