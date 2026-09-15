@@ -16,8 +16,9 @@
 </header>
 
 <main class="max-w-md mx-auto px-4 py-6"
+    x-init="buscarHorarios()"
     x-data="{
-        fecha: '',
+        fecha: '{{ now()->toDateString() }}',
         hora: '',
         slots: [],
         cargando: false,
