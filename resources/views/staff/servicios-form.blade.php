@@ -10,8 +10,18 @@
 
 <div>
     <label class="block text-sm mb-1">Nombre del servicio</label>
+    @php
+        $rubroServicio = \Illuminate\Support\Facades\Auth::guard('web')->user()->empresa->rubro;
+        $placeholderNombre = match ($rubroServicio) {
+            'peluqueria', 'barberia' => 'Ej: Degradé, Barba, Corte clásico, Mechas...',
+            'estetica', 'unas' => 'Ej: Manicura, Pedicura, Limpieza facial...',
+            'salud' => 'Ej: Consulta general, Control, Limpieza dental...',
+            'especialista' => 'Ej: Sesión de masajes, Evaluación kinesiológica...',
+            default => 'Ej: Nombre del servicio que ofrecés...',
+        };
+    @endphp
     <input type="text" name="nombre" required value="{{ old('nombre', $servicio->nombre ?? '') }}"
-        placeholder="Ej: Degradé, Barba, Corte clásico, Mechas..."
+        placeholder="{{ $placeholderNombre }}"
         class="w-full rounded-md border border-mate-borde bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-mate-salvia">
 </div>
 

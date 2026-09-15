@@ -118,19 +118,21 @@ Route::prefix('staff')->name('staff.')->group(function () {
         // ==============================
         Route::middleware(['rol:admin,operador'])->group(function () {
            Route::get('/empresa/dashboard', function () {
-            $empresaId = auth('web')->user()->empresa_id;
-            $hoy = now()->toDateString();
-            $limite = now()->addDays(5)->toDateString();
+                $empresaId = auth('web')->user()->empresa_id;
+                $hoy = now()->toDateString();
+                $limite = now()->addDays(5)->toDateString();
 
-            $cantidadRenovaciones = \Illuminate\Support\Facades\DB::table('turno_servicios')
-                ->join('turnos', 'turnos.id', '=', 'turno_servicios.turno_id')
-                ->where('turnos.empresa_id', $empresaId)
-                ->whereBetween('turno_servicios.fecha_renovacion', [$hoy, $limite])
-                ->whereNull('turno_servicios.renovacion_resuelta_at')
-                ->count();
+                $cantidadRenovaciones = \Illuminate\Support\Facades\DB::table('turno_servicios')
+                    ->join('turnos', 'turnos.id', '=', 'turno_servicios.turno_id')
+                    ->where('turnos.empresa_id', $empresaId)
+                    ->whereBetween('turno_servicios.fecha_renovacion', [$hoy, $limite])
+                    ->whereNull('turno_servicios.renovacion_resuelta_at')
+                    ->count();
 
-            return view('staff.empresa-dashboard', compact('cantidadRenovaciones'));
-        })->name('empresa.dashboard');
+                $sinProfesionales = !\App\Models\Profesional::where('empresa_id', $empresaId)->where('activo', true)->exists();
+
+                return view('staff.empresa-dashboard', compact('cantidadRenovaciones', 'sinProfesionales'));
+            })->name('empresa.dashboard');
 
             Route::post('/empresa/buscar', [BuscadorInternoController::class, 'buscar'])->name('empresa.buscar');
 

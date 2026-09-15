@@ -9,6 +9,15 @@
         Hola, {{ $usuarioActual->nombre }} ({{ $usuarioActual->rol }}).
     </p>
 
+    @if ($sinProfesionales)
+        <div class="mb-6 text-sm text-yellow-800 bg-yellow-50 border border-yellow-200 rounded-md p-3">
+            ⚠️ Todavía no cargaste ningún profesional activo. Sin al menos uno, tus clientes <strong>no van a poder reservar turnos</strong>.
+            @if (auth('web')->user()->esAdmin())
+                <a href="{{ route('staff.empresa.profesionales.create') }}" class="underline font-medium">Cargar uno ahora</a>
+            @endif
+        </div>
+    @endif
+
     <form method="POST" action="{{ route('staff.empresa.buscar') }}" class="mb-6 max-w-sm">
         @csrf
         <div class="flex gap-2 mb-2">
