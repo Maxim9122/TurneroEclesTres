@@ -12,7 +12,8 @@
         </div>
     @endif
 
-    <form method="POST" action="{{ route('cliente.register') }}" class="space-y-4">
+    <form method="POST" action="{{ route('cliente.register') }}" class="space-y-4"
+        onsubmit="const btn = this.querySelector('button[type=submit]'); setTimeout(() => { btn.disabled = true; btn.innerText = 'Creando cuenta...'; }, 0);">
         @csrf
         <div>
             <label class="block text-sm mb-1">Nombre</label>
@@ -41,7 +42,7 @@
         </div>
         <x-recaptcha />
         <button type="submit"
-            class="w-full bg-mate-salvia hover:bg-mate-salvia-oscuro text-white rounded-md py-2.5 text-sm font-medium transition-colors">
+            class="w-full bg-mate-salvia hover:bg-mate-salvia-oscuro disabled:opacity-60 disabled:cursor-not-allowed text-white rounded-md py-2.5 text-sm font-medium">
             Crear cuenta
         </button>
     </form>

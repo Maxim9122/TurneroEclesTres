@@ -12,7 +12,8 @@
         </div>
     @endif
 
-    <form method="POST" action="{{ route('staff.registro-empresa') }}" class="space-y-4">
+    <form method="POST" action="{{ route('staff.registro-empresa') }}" class="space-y-4"
+        onsubmit="const btn = this.querySelector('button[type=submit]'); setTimeout(() => { btn.disabled = true; btn.innerText = 'Registrando...'; }, 0);">
         @csrf
 
         <div>
@@ -106,7 +107,7 @@
         <x-recaptcha />
 
         <button type="submit"
-            class="w-full bg-mate-salvia hover:bg-mate-salvia-oscuro text-white rounded-md py-2.5 text-sm font-medium">
+            class="w-full bg-mate-salvia hover:bg-mate-salvia-oscuro disabled:opacity-60 disabled:cursor-not-allowed text-white rounded-md py-2.5 text-sm font-medium">
             Registrar mi negocio
         </button>
     </form>
