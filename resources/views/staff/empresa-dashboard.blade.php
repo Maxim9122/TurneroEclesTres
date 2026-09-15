@@ -63,14 +63,48 @@
     </div>
 
     @if ($usuarioActual->esAdmin())
-        <div class="mb-6 bg-mate-superficie border border-mate-borde rounded-md p-4">
+        <div class="mb-6 bg-mate-superficie border border-mate-borde rounded-md p-4"
+            x-data="{ qrAbierto: false }">
             <p class="text-sm text-mate-tinta/70 mb-1">Tu link público para compartir con clientes:</p>
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-2 flex-wrap">
                 <input type="text" readonly value="{{ route('publico.empresa', $empresa) }}"
-                    class="flex-1 text-sm bg-white border border-mate-borde rounded-md px-3 py-2"
+                    class="flex-1 min-w-[180px] text-sm bg-white border border-mate-borde rounded-md px-3 py-2"
                     onclick="this.select()">
                 <a href="{{ route('publico.empresa', $empresa) }}" target="_blank"
                     class="text-sm text-mate-salvia font-medium whitespace-nowrap">Ver perfil →</a>
+                <button type="button" @click="qrAbierto = true"
+                    class="text-sm bg-mate-salvia text-white rounded-md px-3 py-2 font-medium whitespace-nowrap">
+                    📱 Ver código QR
+                </button>
+            </div>
+
+            {{-- Modal con el QR --}}
+            <div x-show="qrAbierto" x-cloak
+                class="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50"
+                style="display: none;">
+                <div @click.outside="qrAbierto = false" class="bg-white rounded-lg max-w-xs w-full p-5 text-center">
+                    <p class="font-medium text-sm mb-3">Código QR de {{ $empresa->nombre }}</p>
+
+                    @php
+                        $urlEmpresa = route('publico.empresa', $empresa);
+                        $urlQr = 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=' . urlencode($urlEmpresa);
+                    @endphp
+
+                    <img src="{{ $urlQr }}" alt="Código QR" class="mx-auto mb-4 border border-mate-borde rounded-md" width="250" height="250">
+
+                    <p class="text-xs text-mate-tinta/50 mb-4">Tus clientes pueden escanearlo con la cámara del celular para entrar directo a tu perfil.</p>
+
+                    <div class="flex gap-2">
+                        <a href="{{ $urlQr }}" download="qr-{{ $empresa->slug }}.png"
+                            class="flex-1 bg-mate-salvia hover:bg-mate-salvia-oscuro text-white rounded-md py-2 text-sm font-medium">
+                            Descargar
+                        </a>
+                        <button type="button" @click="qrAbierto = false"
+                            class="flex-1 border border-mate-borde rounded-md py-2 text-sm font-medium">
+                            Cerrar
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
 
