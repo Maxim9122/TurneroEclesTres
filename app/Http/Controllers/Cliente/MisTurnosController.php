@@ -5,14 +5,17 @@ namespace App\Http\Controllers\Cliente;
 use App\Http\Controllers\Controller;
 use App\Models\Turno;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
 class MisTurnosController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
         $clienteId = Auth::guard('cliente')->id();
+        $desde = $request->query('desde');
+        $hasta = $request->query('hasta');
 
         $proximos = Turno::with(['empresa', 'profesional', 'servicios'])
             ->where('cliente_id', $clienteId)
@@ -37,12 +40,14 @@ class MisTurnosController extends Controller
                             ->where('fecha', '<', now()->toDateString());
                     });
             })
+            ->when($desde, fn ($q) => $q->whereDate('fecha', '>=', $desde))
+            ->when($hasta, fn ($q) => $q->whereDate('fecha', '<=', $hasta))
             ->orderByDesc('fecha')
             ->orderByDesc('hora_inicio')
-            ->limit(20)
-            ->get();
+            ->paginate(10)
+            ->withQueryString();
 
-        return view('cliente.mis-turnos', compact('proximos', 'historial'));
+        return view('cliente.mis-turnos', compact('proximos', 'historial', 'desde', 'hasta'));
     }
 
     public function cancelar(Turno $turno): RedirectResponse

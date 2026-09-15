@@ -9,6 +9,25 @@
         Hola, {{ $usuarioActual->nombre }} ({{ $usuarioActual->rol }}).
     </p>
 
+    <form method="POST" action="{{ route('staff.empresa.buscar') }}" class="mb-6 max-w-sm">
+        @csrf
+        <div class="flex gap-2 mb-2">
+            <input type="number" name="numero" required placeholder="Buscar por N°..."
+                class="flex-1 rounded-md border border-mate-borde bg-white px-3 py-2 text-sm">
+            <button type="submit" class="bg-mate-salvia text-white rounded-md px-4 py-2 text-sm font-medium">🔍</button>
+        </div>
+        <div class="flex gap-4 text-sm text-mate-tinta/70">
+            <label class="flex items-center gap-1.5">
+                <input type="radio" name="tipo" value="turno" checked class="border-mate-borde">
+                Turno
+            </label>
+            <label class="flex items-center gap-1.5">
+                <input type="radio" name="tipo" value="pedido" class="border-mate-borde">
+                Pedido
+            </label>
+        </div>
+    </form>
+    
     {{-- Visible para CUALQUIER staff logueado: admin u operador --}}
     <div class="flex flex-wrap gap-3 mb-6">
         <a href="{{ route('staff.empresa.turnos.index') }}"

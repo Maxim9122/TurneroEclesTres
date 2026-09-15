@@ -40,4 +40,9 @@ class Pedido extends Model
     {
         return $this->hasMany(PedidoItem::class);
     }
+
+    public function historiales(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(PedidoHistorial::class)->orderByDesc('created_at');
+    }
 }

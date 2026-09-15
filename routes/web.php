@@ -29,6 +29,7 @@ use App\Http\Controllers\Cliente\MiPerfilController as ClienteMiPerfilController
 use App\Http\Controllers\Staff\CategoriaProductoController;
 use App\Http\Controllers\Staff\RenovacionController;
 use App\Http\Controllers\Staff\TurnoManualController;
+use App\Http\Controllers\Staff\BuscadorInternoController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -114,26 +115,33 @@ Route::prefix('staff')->name('staff.')->group(function () {
         // ADMIN Y OPERADOR (tareas del día a día de la empresa)
         // ==============================
         Route::middleware(['rol:admin,operador'])->group(function () {
-            Route::get('/empresa/dashboard', function () {
-                $empresaId = auth('web')->user()->empresa_id;
-                $hoy = now()->toDateString();
-                $limite = now()->addDays(5)->toDateString();
+           Route::get('/empresa/dashboard', function () {
+            $empresaId = auth('web')->user()->empresa_id;
+            $hoy = now()->toDateString();
+            $limite = now()->addDays(5)->toDateString();
 
-                $cantidadRenovaciones = \Illuminate\Support\Facades\DB::table('turno_servicios')
-                    ->join('turnos', 'turnos.id', '=', 'turno_servicios.turno_id')
-                    ->where('turnos.empresa_id', $empresaId)
-                    ->whereBetween('turno_servicios.fecha_renovacion', [$hoy, $limite])
-                    ->count();
+            $cantidadRenovaciones = \Illuminate\Support\Facades\DB::table('turno_servicios')
+                ->join('turnos', 'turnos.id', '=', 'turno_servicios.turno_id')
+                ->where('turnos.empresa_id', $empresaId)
+                ->whereBetween('turno_servicios.fecha_renovacion', [$hoy, $limite])
+                ->whereNull('turno_servicios.renovacion_resuelta_at')
+                ->count();
 
-                return view('staff.empresa-dashboard', compact('cantidadRenovaciones'));
-            })->name('empresa.dashboard');
+            return view('staff.empresa-dashboard', compact('cantidadRenovaciones'));
+        })->name('empresa.dashboard');
+
+            Route::post('/empresa/buscar', [BuscadorInternoController::class, 'buscar'])->name('empresa.buscar');
 
             // Pedidos
+            Route::get('/empresa/productos/buscar', [ProductoController::class, 'buscar'])->name('empresa.productos.buscar');
+            Route::get('/empresa/pedidos/{pedido}/editar', [StaffPedidoController::class, 'edit'])->name('empresa.pedidos.edit');
+            Route::put('/empresa/pedidos/{pedido}', [StaffPedidoController::class, 'update'])->name('empresa.pedidos.update');
             Route::get('/empresa/pedidos', [StaffPedidoController::class, 'index'])->name('empresa.pedidos.index');
             Route::post('/empresa/pedidos/{pedido}/estado', [StaffPedidoController::class, 'cambiarEstado'])->name('empresa.pedidos.estado');
             Route::get('/empresa/pedidos/{pedido}/remito', [RemitoController::class, 'enviarPedido'])->name('empresa.pedidos.remito');
 
             // Turnos
+            Route::post('/empresa/renovaciones/{turnoServicio}/resolver', [RenovacionController::class, 'marcarResuelta'])->name('empresa.renovaciones.resolver');
             Route::get('/empresa/turnos/nuevo-manual', [TurnoManualController::class, 'iniciar'])->name('empresa.turnos.manual.iniciar');
             Route::post('/empresa/turnos/nuevo-manual', [TurnoManualController::class, 'confirmar'])->name('empresa.turnos.manual.confirmar');
             Route::get('/empresa/turnos', [TurnoController::class, 'index'])->name('empresa.turnos.index');

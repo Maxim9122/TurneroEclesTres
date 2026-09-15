@@ -3,7 +3,20 @@
         <h1 class="font-display text-2xl">Mis pedidos</h1>
         <a href="{{ route('cliente.home') }}" class="text-sm text-mate-salvia">Volver</a>
     </div>
-
+    <form method="GET" class="flex flex-wrap items-end gap-3 mb-6">
+        <div>
+            <label class="block text-xs mb-1">Desde</label>
+            <input type="date" name="desde" value="{{ $desde }}" class="rounded-md border border-mate-borde bg-white px-3 py-2 text-sm">
+        </div>
+        <div>
+            <label class="block text-xs mb-1">Hasta</label>
+            <input type="date" name="hasta" value="{{ $hasta }}" class="rounded-md border border-mate-borde bg-white px-3 py-2 text-sm">
+        </div>
+        <button type="submit" class="bg-mate-salvia text-white rounded-md px-4 py-2 text-sm font-medium">Filtrar</button>
+        @if ($desde || $hasta)
+            <a href="{{ route('cliente.pedidos.index') }}" class="text-sm text-mate-tinta/60 underline">Limpiar</a>
+        @endif
+    </form>
     <div class="space-y-3">
         @forelse ($pedidos as $pedido)
             <div class="bg-mate-superficie border border-mate-borde rounded-lg p-4">
@@ -43,5 +56,8 @@
         @empty
             <p class="text-sm text-mate-tinta/60">Todavía no hiciste ningún pedido.</p>
         @endforelse
+    </div>
+    <div class="mt-4">
+        {{ $pedidos->onEachSide(1)->links() }}
     </div>
 </x-layouts.app>

@@ -66,8 +66,7 @@ class ClienteAuthController extends Controller
     public function logout(Request $request): RedirectResponse
     {
         Auth::guard('cliente')->logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
+        $request->session()->regenerate();
 
         return redirect()->route('cliente.login');
     }

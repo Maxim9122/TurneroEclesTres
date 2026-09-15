@@ -20,6 +20,7 @@ class TurnoController extends Controller
         $empresa = Auth::guard('web')->user()->empresa;
 
         $fecha = $request->query('fecha', now()->toDateString());
+        $destacar = $request->query('destacar');
 
         $turnos = $empresa->turnos()
             ->with(['cliente', 'profesional', 'servicios'])
@@ -27,7 +28,7 @@ class TurnoController extends Controller
             ->orderBy('hora_inicio')
             ->get();
 
-        return view('staff.turnos-index', compact('turnos', 'fecha'));
+        return view('staff.turnos-index', compact('turnos', 'fecha', 'destacar'));
     }
 
     public function edit(Turno $turno): View

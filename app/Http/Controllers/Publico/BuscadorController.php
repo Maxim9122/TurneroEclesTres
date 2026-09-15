@@ -26,7 +26,8 @@ class BuscadorController extends Controller
             })
             ->when($rubro, fn ($query) => $query->where('rubro', $rubro))
             ->orderBy('nombre')
-            ->get();
+            ->paginate(10)
+            ->withQueryString();
 
         return view('publico.buscador', compact('empresas', 'q', 'rubro'));
     }

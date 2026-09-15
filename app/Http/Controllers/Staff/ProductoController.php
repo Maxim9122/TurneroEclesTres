@@ -158,4 +158,19 @@ class ProductoController extends Controller
     {
         abort_if($producto->empresa_id !== Auth::guard('web')->user()->empresa_id, 403);
     }
+
+    public function buscar(Request $request)
+    {
+        $empresa = Auth::guard('web')->user()->empresa;
+        $q = $request->query('q', '');
+
+        $productos = $empresa->productos()
+            ->where('activo', true)
+            ->where('nombre', 'like', "%{$q}%")
+            ->orderBy('nombre')
+            ->limit(10)
+            ->get(['id', 'nombre', 'precio', 'stock']);
+
+        return response()->json($productos);
+    }
 }

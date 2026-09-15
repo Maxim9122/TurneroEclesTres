@@ -18,11 +18,17 @@
 
     <div class="space-y-3" x-data="{ modalAbierto: false, formPendiente: null, mensajePendiente: '' }">
         @forelse ($turnos as $turno)
-            <div class="bg-mate-superficie border border-mate-borde rounded-lg p-4">
+            <div class="bg-mate-superficie border rounded-lg p-4
+                @if ($destacar && (int) $destacar === $turno->id)
+                    border-mate-salvia ring-2 ring-mate-salvia
+                @else
+                    border-mate-borde
+                @endif
+            ">
                 <div class="flex items-start justify-between gap-3 flex-wrap">
                     <div>
                         <p class="font-medium text-sm">
-                            {{ substr($turno->hora_inicio, 0, 5) }} - {{ substr($turno->hora_fin, 0, 5) }}
+                            #{{ $turno->id }} · {{ substr($turno->hora_inicio, 0, 5) }} - {{ substr($turno->hora_fin, 0, 5) }}
                             · {{ $turno->cliente->nombre }}
                         </p>
                         <p class="text-xs text-mate-tinta/60 mt-0.5">

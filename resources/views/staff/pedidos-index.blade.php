@@ -25,7 +25,13 @@
 
     <div class="space-y-3" x-data="{ modalAbierto: false, formPendiente: null, mensajePendiente: '' }">
         @forelse ($pedidos as $pedido)
-            <div class="bg-mate-superficie border border-mate-borde rounded-lg p-4">
+            <div class="bg-mate-superficie border rounded-lg p-4
+                @if ($destacar && (int) $destacar === $pedido->id)
+                    border-mate-salvia ring-2 ring-mate-salvia
+                @else
+                    border-mate-borde
+                @endif
+            " x-data="{ verHistorial: false }">
                 <div class="flex items-start justify-between gap-3 flex-wrap">
                     <div>
                         <p class="font-medium text-sm">{{ $pedido->cliente->nombre }} · #{{ $pedido->id }}</p>
@@ -71,8 +77,8 @@
                     @php
                         $itemsTexto = $pedido->items->map(fn ($item) => "{$item->cantidad}x {$item->producto->nombre}")->implode(', ');
                         $mensajePedido = "Hola {$pedido->cliente->nombre}! Te confirmamos tu pedido en {$pedido->empresa->nombre} (EclesTres): "
-                        . $itemsTexto . ". Total: \${$pedido->total}. "
-                        . ($pedido->metodo_entrega === 'retiro' ? 'Podés retirarlo en el local.' : 'Coordinamos el envío a tu domicilio.');
+                            . $itemsTexto . ". Total: \${$pedido->total}. "
+                            . ($pedido->metodo_entrega === 'retiro' ? 'Podés retirarlo en el local.' : 'Coordinamos el envío a tu domicilio.');
                         $linkWhatsappPedido = \App\Support\WhatsApp::linkChat($pedido->cliente->telefono, $mensajePedido);
                     @endphp
 
@@ -86,6 +92,10 @@
 
                     <a href="{{ route('staff.empresa.pedidos.remito', $pedido) }}" target="_blank" class="underline text-mate-salvia">
                         📄 Enviar remito
+                    </a>
+
+                    <a href="{{ route('staff.empresa.pedidos.edit', $pedido) }}" class="underline text-mate-tinta/70">
+                        ✏️ Editar venta
                     </a>
 
                     @if ($pedido->estado === 'pendiente')
@@ -151,12 +161,47 @@
                         </form>
                     @endif
                 </div>
+
+                @if ($pedido->historiales->isNotEmpty())
+                    <button type="button" @click="verHistorial = true" class="text-xs underline text-mate-tinta/50 mt-2">
+                        Ver historial de cambios ({{ $pedido->historiales->count() }})
+                    </button>
+
+                    <div x-show="verHistorial" x-cloak
+                        class="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50" style="display: none;">
+                        <div @click.outside="verHistorial = false" class="bg-white rounded-lg max-w-md w-full max-h-[80vh] overflow-y-auto p-5">
+                            <div class="flex items-center justify-between mb-4">
+                                <p class="font-medium text-sm">Historial de la venta #{{ $pedido->id }}</p>
+                                <button type="button" @click="verHistorial = false" class="text-mate-tinta/50 text-xl leading-none">&times;</button>
+                            </div>
+
+                            <div class="space-y-3">
+                                @foreach ($pedido->historiales as $registro)
+                                    <div class="border border-mate-borde rounded-md p-3 text-sm">
+                                        <p class="text-xs text-mate-tinta/50 mb-1">
+                                            {{ $registro->created_at->format('d/m/Y H:i') }}
+                                            @if ($registro->usuario) · {{ $registro->usuario->nombre }} @endif
+                                        </p>
+                                        <p class="mb-2 italic">"{{ $registro->motivo }}"</p>
+                                        <p class="text-xs font-medium mb-1">Contenía antes:</p>
+                                        <ul class="text-xs text-mate-tinta/70 list-disc list-inside">
+                                            @foreach ($registro->items_anterior as $item)
+                                                <li>{{ $item['cantidad'] }} x {{ $item['nombre'] }} (${{ number_format($item['precio_al_momento'], 2, ',', '.') }} c/u)</li>
+                                            @endforeach
+                                        </ul>
+                                        <p class="text-xs mt-1">Total anterior: ${{ number_format($registro->total_anterior, 2, ',', '.') }}</p>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
+                @endif
             </div>
         @empty
             <p class="text-sm text-mate-tinta/60">No hay pedidos en este estado.</p>
         @endforelse
 
-        {{-- Modal de confirmación --}}
+        {{-- Modal de confirmación de cambio de estado --}}
         <div x-show="modalAbierto" x-cloak
             class="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50"
             style="display: none;">
