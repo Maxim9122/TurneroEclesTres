@@ -30,6 +30,8 @@ use App\Http\Controllers\Staff\CategoriaProductoController;
 use App\Http\Controllers\Staff\RenovacionController;
 use App\Http\Controllers\Staff\TurnoManualController;
 use App\Http\Controllers\Staff\BuscadorInternoController;
+use App\Http\Controllers\Staff\TurnoRapidoController;
+use App\Http\Controllers\Staff\ClienteBusquedaController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -141,6 +143,9 @@ Route::prefix('staff')->name('staff.')->group(function () {
             Route::get('/empresa/pedidos/{pedido}/remito', [RemitoController::class, 'enviarPedido'])->name('empresa.pedidos.remito');
 
             // Turnos
+            Route::get('/empresa/turnos/orden-llegada', [TurnoRapidoController::class, 'iniciar'])->name('empresa.turnos.rapido.iniciar');
+            Route::post('/empresa/turnos/orden-llegada', [TurnoRapidoController::class, 'confirmar'])->name('empresa.turnos.rapido.confirmar');
+            Route::get('/empresa/clientes/buscar', [ClienteBusquedaController::class, 'buscar'])->name('empresa.clientes.buscar');
             Route::post('/empresa/renovaciones/{turnoServicio}/resolver', [RenovacionController::class, 'marcarResuelta'])->name('empresa.renovaciones.resolver');
             Route::get('/empresa/turnos/nuevo-manual', [TurnoManualController::class, 'iniciar'])->name('empresa.turnos.manual.iniciar');
             Route::post('/empresa/turnos/nuevo-manual', [TurnoManualController::class, 'confirmar'])->name('empresa.turnos.manual.confirmar');

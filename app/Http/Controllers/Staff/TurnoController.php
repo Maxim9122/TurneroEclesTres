@@ -28,7 +28,51 @@ class TurnoController extends Controller
             ->orderBy('hora_inicio')
             ->get();
 
-        return view('staff.turnos-index', compact('turnos', 'fecha', 'destacar'));
+        $semana = $this->armarSemana($empresa->id, $fecha);
+
+        return view('staff.turnos-index', compact('turnos', 'fecha', 'destacar', 'semana'));
+    }
+
+    /**
+     * Arma los 7 días de la semana (lunes a domingo) que contiene $fecha,
+     * con la cantidad de turnos pendientes de cada día.
+     */
+    private function armarSemana(int $empresaId, string $fecha): array
+    {
+        $inicioSemana = Carbon::parse($fecha)->startOfWeek(Carbon::MONDAY);
+        $finSemana = $inicioSemana->copy()->endOfWeek(Carbon::SUNDAY);
+
+        $confirmadosPorDia = Turno::where('empresa_id', $empresaId)
+            ->where('estado', 'confirmado')
+            ->whereBetween('fecha', [$inicioSemana->toDateString(), $finSemana->toDateString()])
+            ->selectRaw('fecha, COUNT(*) as total')
+            ->groupBy('fecha')
+            ->pluck('total', 'fecha');
+
+        $totalesPorDia = Turno::where('empresa_id', $empresaId)
+            ->whereBetween('fecha', [$inicioSemana->toDateString(), $finSemana->toDateString()])
+            ->selectRaw('fecha, COUNT(*) as total')
+            ->groupBy('fecha')
+            ->pluck('total', 'fecha');
+
+        $dias = [];
+
+        for ($i = 0; $i < 7; $i++) {
+            $diaFecha = $inicioSemana->copy()->addDays($i);
+            $dias[] = [
+                'fecha' => $diaFecha->toDateString(),
+                'nombre_corto' => $diaFecha->translatedFormat('D'),
+                'numero' => $diaFecha->format('d'),
+                'pendientes' => $confirmadosPorDia->get($diaFecha->toDateString(), 0),
+                'total' => $totalesPorDia->get($diaFecha->toDateString(), 0),
+            ];
+        }
+
+        return [
+            'dias' => $dias,
+            'semana_anterior' => $inicioSemana->copy()->subWeek()->toDateString(),
+            'semana_siguiente' => $inicioSemana->copy()->addWeek()->toDateString(),
+        ];
     }
 
     public function edit(Turno $turno): View

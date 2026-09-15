@@ -10,13 +10,110 @@
         </div>
     @endif
 
-    <form method="GET" action="{{ route('staff.empresa.turnos.index') }}" class="mb-6">
-        <label class="block text-sm mb-1">Fecha</label>
-        <input type="date" name="fecha" value="{{ $fecha }}" onchange="this.form.submit()"
-            class="rounded-md border border-mate-borde bg-white px-3 py-2 text-sm">
-    </form>
+    <div class="mb-6">
+        <div class="flex items-center justify-between mb-2">
+            <a href="{{ route('staff.empresa.turnos.index', ['fecha' => $semana['semana_anterior']]) }}"
+                class="text-sm text-mate-salvia">&larr; Semana anterior</a>
+            <a href="{{ route('staff.empresa.turnos.index', ['fecha' => $semana['semana_siguiente']]) }}"
+                class="text-sm text-mate-salvia">Semana siguiente &rarr;</a>
+        </div>
 
-    <div class="space-y-3" x-data="{ modalAbierto: false, formPendiente: null, mensajePendiente: '' }">
+        <div class="grid grid-cols-7 gap-1.5">
+            @foreach ($semana['dias'] as $dia)
+                <a href="{{ route('staff.empresa.turnos.index', ['fecha' => $dia['fecha']]) }}"
+                    class="relative flex flex-col items-center rounded-md border py-2 text-xs
+                        {{ $dia['fecha'] === $fecha ? 'bg-mate-salvia text-white border-mate-salvia' : 'bg-mate-superficie border-mate-borde' }}
+                        {{ $dia['fecha'] === now()->toDateString() && $dia['fecha'] !== $fecha ? 'ring-1 ring-mate-arcilla' : '' }}">
+                    <span class="uppercase">{{ $dia['nombre_corto'] }}</span>
+                    <span class="font-medium text-sm">{{ $dia['numero'] }}</span>
+
+                    @if ($dia['pendientes'] > 0)
+                        <span class="absolute -top-1.5 -right-1.5 bg-mate-arcilla text-white text-[10px] font-medium rounded-full w-4 h-4 flex items-center justify-center">
+                            {{ $dia['pendientes'] }}
+                        </span>
+                    @endif
+
+                    @if ($dia['total'] > 0)
+                        <span class="absolute -bottom-1.5 -right-1.5 text-[10px] font-semibold text-mate-arcilla bg-white rounded-full w-4 h-4 flex items-center justify-center border border-mate-arcilla">
+                            {{ $dia['total'] }}
+                        </span>
+                    @endif
+                </a>
+            @endforeach
+        </div>
+
+        <form method="GET" action="{{ route('staff.empresa.turnos.index') }}" class="mt-3">
+            <label class="block text-sm mb-1">O elegí otra fecha</label>
+            <input type="date" name="fecha" value="{{ $fecha }}" onchange="this.form.submit()"
+                class="rounded-md border border-mate-borde bg-white px-3 py-2 text-sm">
+        </form>
+    </div>
+
+    <div class="space-y-3" x-data="{
+        modalAbierto: false, formPendiente: null, mensajePendiente: '',
+        modalRapidoAbierto: false,
+        rapido: {
+            clienteId: '', clienteNombre: '', esNuevo: false,
+            busqueda: '', resultados: [], servicioIds: [],
+            profesional: '', enviando: false, error: '',
+            buscarCliente() {
+                if (this.busqueda.length < 2) { this.resultados = []; return; }
+                fetch('{{ route('staff.empresa.clientes.buscar') }}?q=' + encodeURIComponent(this.busqueda))
+                    .then(r => r.json())
+                    .then(data => { this.resultados = data; });
+            },
+            elegirCliente(cliente) {
+                this.clienteId = cliente.id;
+                this.clienteNombre = cliente.nombre + (cliente.telefono ? ' (' + cliente.telefono + ')' : '');
+                this.busqueda = ''; this.resultados = []; this.esNuevo = false;
+            },
+            marcarNuevo() {
+                this.clienteId = ''; this.clienteNombre = ''; this.esNuevo = true; this.resultados = [];
+            },
+            toggleServicio(id) {
+                this.servicioIds.includes(id)
+                    ? this.servicioIds = this.servicioIds.filter(s => s !== id)
+                    : this.servicioIds.push(id);
+            },
+            reset() {
+                this.clienteId = ''; this.clienteNombre = ''; this.esNuevo = false;
+                this.busqueda = ''; this.resultados = []; this.servicioIds = [];
+                this.profesional = ''; this.error = '';
+            },
+            enviar(event) {
+                this.enviando = true;
+                this.error = '';
+                const form = event.target;
+                const formData = new FormData(form);
+
+                fetch(form.action, {
+                    method: 'POST',
+                    headers: { 'Accept': 'application/json' },
+                    body: formData,
+                })
+                .then(async (r) => {
+                    const data = await r.json();
+                    if (!r.ok) throw new Error(data.error || 'Ocurrió un error.');
+                    return data;
+                })
+                .then(() => {
+                    this.enviando = false;
+                    this.modalRapidoAbierto = false;
+                    this.reset();
+                    window.location.reload();
+                })
+                .catch((err) => {
+                    this.enviando = false;
+                    this.error = err.message;
+                });
+            }
+        }
+    }">
+        <button type="button" @click="modalRapidoAbierto = true"
+            class="inline-block mb-6 bg-mate-arcilla hover:opacity-90 text-white rounded-md px-4 py-2.5 text-sm font-medium">
+            + Orden de llegada (cliente sin turno)
+        </button>
+
         @forelse ($turnos as $turno)
             <div class="bg-mate-superficie border rounded-lg p-4
                 @if ($destacar && (int) $destacar === $turno->id)
@@ -55,8 +152,8 @@
                 <div class="flex flex-wrap gap-2 mt-3 text-sm">
                     @php
                         $mensajeTurno = "Hola {$turno->cliente->nombre}! Te confirmamos tu turno en {$turno->empresa->nombre} (EclesTres) "
-                        . "para el {$turno->fecha->format('d/m/Y')} a las " . substr($turno->hora_inicio, 0, 5) . "hs. "
-                        . "Servicios: " . $turno->servicios->pluck('nombre')->implode(' + ') . ". ¡Te esperamos!";
+                            . "para el {$turno->fecha->format('d/m/Y')} a las " . substr($turno->hora_inicio, 0, 5) . "hs. "
+                            . "Servicios: " . $turno->servicios->pluck('nombre')->implode(' + ') . ". ¡Te esperamos!";
                         $linkWhatsapp = \App\Support\WhatsApp::linkChat($turno->cliente->telefono, $mensajeTurno);
                     @endphp
 
@@ -124,7 +221,7 @@
             <p class="text-sm text-mate-tinta/60">No hay turnos para esta fecha.</p>
         @endforelse
 
-        {{-- Modal de confirmación --}}
+        {{-- Modal de confirmación de cambio de estado --}}
         <div x-show="modalAbierto" x-cloak
             class="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50"
             style="display: none;">
@@ -140,6 +237,106 @@
                         Sí, confirmar
                     </button>
                 </div>
+            </div>
+        </div>
+
+        {{-- Modal de orden de llegada --}}
+        <div x-show="modalRapidoAbierto" x-cloak
+            class="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50"
+            style="display: none;">
+            <div @click.outside="modalRapidoAbierto = false" class="bg-white rounded-lg max-w-md w-full max-h-[90vh] overflow-y-auto p-5">
+                <div class="flex items-center justify-between mb-4">
+                    <p class="font-medium text-sm">Orden de llegada</p>
+                    <button type="button" @click="modalRapidoAbierto = false" class="text-mate-tinta/50 text-xl leading-none">&times;</button>
+                </div>
+
+                <p class="text-xs text-mate-tinta/60 mb-4">Para clientes que llegan sin turno y se atienden en el momento.</p>
+
+                <div x-show="rapido.error" x-cloak class="mb-4 text-sm text-red-700 bg-red-50 border border-red-200 rounded-md p-3" x-text="rapido.error"></div>
+
+                <form @submit.prevent="rapido.enviar($event)" action="{{ route('staff.empresa.turnos.rapido.confirmar') }}" class="space-y-4">
+                    @csrf
+
+                    <div>
+                        <label class="block text-sm mb-1">Cliente</label>
+
+                        <template x-if="rapido.clienteId && !rapido.esNuevo">
+                            <div class="flex items-center justify-between bg-mate-fondo border border-mate-borde rounded-md px-3 py-2 text-sm">
+                                <span x-text="rapido.clienteNombre"></span>
+                                <button type="button" @click="rapido.clienteId = ''; rapido.clienteNombre = ''" class="text-xs text-red-600">Cambiar</button>
+                            </div>
+                        </template>
+
+                        <template x-if="!rapido.clienteId && !rapido.esNuevo">
+                            <div class="relative">
+                                <input type="text" x-model="rapido.busqueda" @input="rapido.buscarCliente()"
+                                    placeholder="Buscar por nombre o teléfono..."
+                                    class="w-full rounded-md border border-mate-borde bg-white px-3 py-2 text-sm">
+
+                                <div x-show="rapido.resultados.length > 0" x-cloak
+                                    class="absolute z-10 w-full bg-white border border-mate-borde rounded-md mt-1 shadow-lg max-h-32 overflow-y-auto">
+                                    <template x-for="cliente in rapido.resultados" :key="cliente.id">
+                                        <button type="button" @click="rapido.elegirCliente(cliente)"
+                                            class="w-full text-left px-3 py-2 text-sm hover:bg-mate-fondo flex justify-between">
+                                            <span x-text="cliente.nombre"></span>
+                                            <span class="text-xs text-mate-tinta/50" x-text="cliente.telefono"></span>
+                                        </button>
+                                    </template>
+                                </div>
+
+                                <button type="button" @click="rapido.marcarNuevo()" class="text-xs text-mate-salvia mt-1.5 underline">
+                                    + Es un cliente nuevo
+                                </button>
+                            </div>
+                        </template>
+
+                        <template x-if="rapido.esNuevo">
+                            <div class="space-y-2">
+                                <input type="text" name="cliente_nombre_nuevo" placeholder="Nombre del cliente"
+                                    class="w-full rounded-md border border-mate-borde bg-white px-3 py-2 text-sm">
+                                <input type="tel" name="cliente_telefono_nuevo" placeholder="Teléfono (opcional)"
+                                    class="w-full rounded-md border border-mate-borde bg-white px-3 py-2 text-sm">
+                                <button type="button" @click="rapido.esNuevo = false" class="text-xs text-mate-tinta/60 underline">
+                                    Buscar cliente existente en su lugar
+                                </button>
+                            </div>
+                        </template>
+
+                        <input type="hidden" name="cliente_id" x-bind:value="rapido.clienteId">
+                    </div>
+
+                    <div>
+                        <p class="text-sm font-medium mb-2">Servicios</p>
+                        <div class="space-y-2 max-h-40 overflow-y-auto">
+                            @foreach (Auth::guard('web')->user()->empresa->servicios()->where('activo', true)->orderBy('nombre')->get() as $servicio)
+                                <label class="flex items-center justify-between bg-white border border-mate-borde rounded-md px-3 py-2 text-sm cursor-pointer">
+                                    <span class="flex items-center gap-2">
+                                        <input type="checkbox" name="servicios[]" value="{{ $servicio->id }}"
+                                            @change="rapido.toggleServicio({{ $servicio->id }})" class="rounded border-mate-borde">
+                                        {{ $servicio->nombre }}
+                                    </span>
+                                    <span>${{ number_format($servicio->precio, 2, ',', '.') }}</span>
+                                </label>
+                            @endforeach
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm mb-1">Profesional (opcional)</label>
+                        <select name="profesional" x-model="rapido.profesional" class="w-full rounded-md border border-mate-borde bg-white px-3 py-2 text-sm">
+                            <option value="">Sin preferencia</option>
+                            @foreach (Auth::guard('web')->user()->empresa->profesionales()->where('activo', true)->orderBy('nombre')->get() as $profesional)
+                                <option value="{{ $profesional->id }}">{{ $profesional->nombre }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <button type="submit" :disabled="rapido.enviando"
+                        class="w-full bg-mate-salvia hover:bg-mate-salvia-oscuro disabled:opacity-60 text-white rounded-md py-2.5 text-sm font-medium">
+                        <span x-show="!rapido.enviando">Registrar llegada</span>
+                        <span x-show="rapido.enviando" x-cloak>Registrando...</span>
+                    </button>
+                </form>
             </div>
         </div>
     </div>
