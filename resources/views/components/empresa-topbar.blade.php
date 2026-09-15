@@ -16,7 +16,7 @@
         @endif
 
         <div class="min-w-0">
-            <p class="text-white font-display text-base leading-tight drop-shadow truncate">{{ $empresa->nombre }}</p>
+            <p class="text-white font-display text-base leading-tight texto-delineado truncate">{{ $empresa->nombre }}</p>
             @if ($direccion && $direccion->ciudad)
                 <p class="text-white/80 text-xs truncate">
                     {{ $direccion->barrio }}{{ $direccion->barrio && $direccion->ciudad ? ', ' : '' }}{{ $direccion->ciudad }}

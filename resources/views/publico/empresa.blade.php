@@ -36,7 +36,7 @@
             @endif
 
             <div :class="achicado ? 'text-left' : 'text-center'">
-                <h1 class="font-display text-white drop-shadow transition-all duration-300"
+                <h1 class="font-display text-white texto-delineado transition-all duration-300"
                     :class="achicado ? 'text-sm' : 'text-2xl'">
                     {{ $empresa->nombre }}
                 </h1>

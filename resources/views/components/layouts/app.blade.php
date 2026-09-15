@@ -54,7 +54,7 @@
                                 class="w-10 h-10 rounded-full object-cover bg-white shadow shrink-0">
                         @endif
                         <div class="min-w-0">
-                            <p class="text-white font-display text-base leading-tight drop-shadow truncate">{{ $empresaActual->nombre }}</p>
+                            <p class="text-white font-display text-base leading-tight texto-delineado truncate">{{ $empresaActual->nombre }}</p>
                             <p class="text-white/80 text-xs truncate">
                                 {{ ucfirst($empresaActual->rubro) }}
                                 @if ($direccionActual && $direccionActual->ciudad)
