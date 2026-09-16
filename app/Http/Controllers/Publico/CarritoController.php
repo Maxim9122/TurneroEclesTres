@@ -54,19 +54,28 @@ class CarritoController extends Controller
         $data = $request->validate([
             'producto_id' => ['required', 'exists:productos,id'],
             'cantidad' => ['required', 'integer', 'min:1'],
+            'categoria' => ['nullable', 'integer'],
+            'page' => ['nullable', 'integer', 'min:1'],
         ]);
 
         $producto = Producto::where('empresa_id', $empresa->id)
             ->where('activo', true)
             ->findOrFail($data['producto_id']);
 
+        $paramsVolver = array_filter([
+            'categoria' => $data['categoria'] ?? null,
+            'page' => $data['page'] ?? null,
+        ]);
+
         if (!$producto->hayStock($data['cantidad'])) {
-            return back()->with('status', 'No hay stock suficiente de ese producto.');
+            return redirect()->route('publico.empresa', array_merge(['empresa' => $empresa], $paramsVolver))
+                ->with('status', 'No hay stock suficiente de ese producto.');
         }
 
         $this->carrito->agregar($empresa->id, $producto->id, $data['cantidad']);
 
-        return back()->with('status', 'Producto agregado al carrito.');
+        return redirect()->route('publico.empresa', array_merge(['empresa' => $empresa], $paramsVolver))
+            ->with('status', 'Producto agregado al carrito.');
     }
 
     public function actualizar(Request $request, Empresa $empresa, Producto $producto): RedirectResponse

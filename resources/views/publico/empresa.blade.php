@@ -150,6 +150,10 @@
                                     @csrf
                                     <input type="hidden" name="producto_id" value="{{ $producto->id }}">
                                     <input type="hidden" name="cantidad" value="1">
+                                    @if ($categoriaId)
+                                        <input type="hidden" name="categoria" value="{{ $categoriaId }}">
+                                    @endif
+                                    <input type="hidden" name="page" value="{{ $productos->currentPage() }}">
                                     <button type="submit" class="text-xs bg-mate-salvia text-white rounded-md px-3 py-1.5">
                                         Agregar
                                     </button>
