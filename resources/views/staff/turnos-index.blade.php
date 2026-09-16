@@ -56,16 +56,27 @@
             clienteId: '', clienteNombre: '', esNuevo: false,
             busqueda: '', resultados: [], servicioIds: [],
             profesional: '', enviando: false, error: '',
+            indiceActivo: -1,
             buscarCliente() {
+                this.indiceActivo = -1;
                 if (this.busqueda.length < 2) { this.resultados = []; return; }
                 fetch('{{ route('staff.empresa.clientes.buscar') }}?q=' + encodeURIComponent(this.busqueda))
                     .then(r => r.json())
                     .then(data => { this.resultados = data; });
             },
+            moverSeleccion(direccion) {
+                if (this.resultados.length === 0) return;
+                this.indiceActivo = (this.indiceActivo + direccion + this.resultados.length) % this.resultados.length;
+            },
+            confirmarSeleccion() {
+                if (this.indiceActivo >= 0 && this.resultados[this.indiceActivo]) {
+                    this.elegirCliente(this.resultados[this.indiceActivo]);
+                }
+            },
             elegirCliente(cliente) {
                 this.clienteId = cliente.id;
                 this.clienteNombre = cliente.nombre + (cliente.telefono ? ' (' + cliente.telefono + ')' : '');
-                this.busqueda = ''; this.resultados = []; this.esNuevo = false;
+                this.busqueda = ''; this.resultados = []; this.esNuevo = false; this.indiceActivo = -1;
             },
             marcarNuevo() {
                 this.clienteId = ''; this.clienteNombre = ''; this.esNuevo = true; this.resultados = [];
@@ -270,16 +281,22 @@
                         <template x-if="!rapido.clienteId && !rapido.esNuevo">
                             <div class="relative">
                                 <input type="text" x-model="rapido.busqueda" @input="rapido.buscarCliente()"
+                                    @keydown.down.prevent="rapido.moverSeleccion(1)"
+                                    @keydown.up.prevent="rapido.moverSeleccion(-1)"
+                                    @keydown.enter.prevent="rapido.confirmarSeleccion()"
+                                    @keydown.escape="rapido.resultados = []; rapido.indiceActivo = -1"
                                     placeholder="Buscar por nombre o teléfono..."
                                     class="w-full rounded-md border border-mate-borde bg-white px-3 py-2 text-sm">
 
                                 <div x-show="rapido.resultados.length > 0" x-cloak
                                     class="absolute z-10 w-full bg-white border border-mate-borde rounded-md mt-1 shadow-lg max-h-32 overflow-y-auto">
-                                    <template x-for="cliente in rapido.resultados" :key="cliente.id">
-                                        <button type="button" @click="rapido.elegirCliente(cliente)"
-                                            class="w-full text-left px-3 py-2 text-sm hover:bg-mate-fondo flex justify-between">
+                                    <template x-for="(cliente, i) in rapido.resultados" :key="cliente.id">
+                                        <button type="button" @click="rapido.elegirCliente(cliente)" @mouseenter="rapido.indiceActivo = i"
+                                            class="w-full text-left px-3 py-2 text-sm flex justify-between"
+                                            :class="rapido.indiceActivo === i ? 'bg-mate-salvia text-white' : 'hover:bg-mate-fondo'">
                                             <span x-text="cliente.nombre"></span>
-                                            <span class="text-xs text-mate-tinta/50" x-text="cliente.telefono"></span>
+                                            <span class="text-xs" :class="rapido.indiceActivo === i ? 'text-white/80' : 'text-mate-tinta/50'"
+                                                x-text="cliente.telefono"></span>
                                         </button>
                                     </template>
                                 </div>
