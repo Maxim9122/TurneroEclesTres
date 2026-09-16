@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Auth;
 
 class BuscadorInternoController extends Controller
 {
+    private const POR_PAGINA = 10;
+
     public function buscar(Request $request): RedirectResponse
     {
         $data = $request->validate([
@@ -25,10 +27,8 @@ class BuscadorInternoController extends Controller
             $turno = Turno::where('id', $numero)->where('empresa_id', $empresaId)->first();
 
             if ($turno) {
-                return redirect()->route('staff.empresa.turnos.index', [
-                    'fecha' => $turno->fecha->toDateString(),
-                    'destacar' => $turno->id,
-                ])->with('status', "Turno #{$numero} encontrado, mostrado abajo resaltado en la fecha {$turno->fecha->format('d/m/Y')}.");
+                return redirect()->route('staff.empresa.turnos.index', ['fecha' => $turno->fecha->toDateString()])
+                    ->with('status', "Turno #{$numero} encontrado, mostrado abajo resaltado en la fecha {$turno->fecha->format('d/m/Y')}.");
             }
 
             return back()->with('status', "No encontramos ningún turno #{$numero} en tu empresa.");
@@ -37,7 +37,15 @@ class BuscadorInternoController extends Controller
         $pedido = Pedido::where('id', $numero)->where('empresa_id', $empresaId)->first();
 
         if ($pedido) {
-            return redirect()->route('staff.empresa.pedidos.index', ['destacar' => $pedido->id])
+            // Calculamos en qué página cae este pedido, según el orden por fecha
+            // descendente que usa el listado (sin ningún filtro de estado aplicado).
+            $posicion = Pedido::where('empresa_id', $empresaId)
+                ->where('created_at', '>', $pedido->created_at)
+                ->count();
+
+            $pagina = intdiv($posicion, self::POR_PAGINA) + 1;
+
+            return redirect()->route('staff.empresa.pedidos.index', ['destacar' => $pedido->id, 'page' => $pagina])
                 ->with('status', "Pedido #{$numero} encontrado, mostrado abajo resaltado.");
         }
 
