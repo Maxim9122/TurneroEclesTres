@@ -70,6 +70,65 @@
     <main class="px-4 py-6 sm:px-6 max-w-5xl mx-auto">
         {{ $slot }}
     </main>
+    @if (request()->routeIs('staff.*') && auth('web')->check() && !auth('web')->user()->esSuperAdmin())
+        <div x-data="{
+                toastVisible: false,
+                mensaje: '',
+                ultimaVerificacion: localStorage.getItem('eclestres_ultima_notif') || new Date(Date.now() - 60000).toISOString(),
+                sonar() {
+                    try {
+                        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                        const osc = ctx.createOscillator();
+                        const gain = ctx.createGain();
+                        osc.connect(gain);
+                        gain.connect(ctx.destination);
+                        osc.frequency.value = 880;
+                        gain.gain.setValueAtTime(0.15, ctx.currentTime);
+                        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
+                        osc.start();
+                        osc.stop(ctx.currentTime + 0.5);
+                    } catch (e) {}
+                },
+                verificar() {
+                    fetch('{{ route('staff.empresa.notificaciones.verificar') }}?desde=' + encodeURIComponent(this.ultimaVerificacion))
+                        .then(r => r.json())
+                        .then(data => {
+                            const total = data.turnos + data.pedidos;
+                            if (total > 0) {
+                                let partes = [];
+                                if (data.turnos > 0) partes.push(data.turnos + (data.turnos === 1 ? ' turno nuevo' : ' turnos nuevos'));
+                                if (data.pedidos > 0) partes.push(data.pedidos + (data.pedidos === 1 ? ' pedido nuevo' : ' pedidos nuevos'));
+                                this.mensaje = partes.join(' y ');
+                                this.toastVisible = true;
+                                this.sonar();
+                                setTimeout(() => { this.toastVisible = false; }, 6000);
+                            }
+                            this.ultimaVerificacion = data.ahora;
+                            localStorage.setItem('eclestres_ultima_notif', data.ahora);
+                        })
+                        .catch(() => {});
+                }
+            }"
+            x-init="setInterval(() => verificar(), 25000)">
+
+            <div x-show="toastVisible" x-cloak
+                x-transition:enter="transition ease-out duration-300"
+                x-transition:enter-start="opacity-0 translate-y-4"
+                x-transition:enter-end="opacity-100 translate-y-0"
+                x-transition:leave="transition ease-in duration-200"
+                x-transition:leave-start="opacity-100"
+                x-transition:leave-end="opacity-0"
+                class="fixed bottom-5 right-5 z-50 bg-mate-tinta text-white rounded-lg shadow-lg px-4 py-3 max-w-xs flex items-center gap-3"
+                style="display: none;">
+                <span class="text-xl">🔔</span>
+                <div class="text-sm">
+                    <p class="font-medium">¡Novedad!</p>
+                    <p class="text-white/80" x-text="mensaje"></p>
+                </div>
+                <button type="button" @click="toastVisible = false" class="text-white/50 text-lg leading-none ml-1">&times;</button>
+            </div>
+        </div>
+    @endif
     <x-footer />
 </body>
 </html>

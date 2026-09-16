@@ -32,6 +32,7 @@ use App\Http\Controllers\Staff\TurnoManualController;
 use App\Http\Controllers\Staff\BuscadorInternoController;
 use App\Http\Controllers\Staff\TurnoRapidoController;
 use App\Http\Controllers\Staff\ClienteBusquedaController;
+use App\Http\Controllers\Staff\NotificacionController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -133,7 +134,7 @@ Route::prefix('staff')->name('staff.')->group(function () {
 
                 return view('staff.empresa-dashboard', compact('cantidadRenovaciones', 'sinProfesionales'));
             })->name('empresa.dashboard');
-
+            Route::get('/empresa/notificaciones/verificar', [NotificacionController::class, 'verificar'])->name('empresa.notificaciones.verificar');
             Route::post('/empresa/buscar', [BuscadorInternoController::class, 'buscar'])->name('empresa.buscar');
 
             // Pedidos
