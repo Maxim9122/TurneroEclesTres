@@ -74,19 +74,30 @@
         <div x-data="{
                 toastVisible: false,
                 mensaje: '',
+                audioCtx: null,
                 ultimaVerificacion: localStorage.getItem('eclestres_ultima_notif') || new Date(Date.now() - 60000).toISOString(),
+                iniciarAudio() {
+                    if (!this.audioCtx) {
+                        try {
+                            this.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                        } catch (e) {}
+                    }
+                },
                 sonar() {
+                    if (!this.audioCtx) return;
                     try {
-                        const ctx = new (window.AudioContext || window.webkitAudioContext)();
-                        const osc = ctx.createOscillator();
-                        const gain = ctx.createGain();
+                        if (this.audioCtx.state === 'suspended') {
+                            this.audioCtx.resume();
+                        }
+                        const osc = this.audioCtx.createOscillator();
+                        const gain = this.audioCtx.createGain();
                         osc.connect(gain);
-                        gain.connect(ctx.destination);
+                        gain.connect(this.audioCtx.destination);
                         osc.frequency.value = 880;
-                        gain.gain.setValueAtTime(0.15, ctx.currentTime);
-                        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
+                        gain.gain.setValueAtTime(0.15, this.audioCtx.currentTime);
+                        gain.gain.exponentialRampToValueAtTime(0.001, this.audioCtx.currentTime + 0.5);
                         osc.start();
-                        osc.stop(ctx.currentTime + 0.5);
+                        osc.stop(this.audioCtx.currentTime + 0.5);
                     } catch (e) {}
                 },
                 verificar() {
@@ -109,7 +120,9 @@
                         .catch(() => {});
                 }
             }"
-            x-init="setInterval(() => verificar(), 25000)">
+            x-init="setInterval(() => verificar(), 25000)"
+            @click.window="iniciarAudio()"
+            @keydown.window="iniciarAudio()">
 
             <div x-show="toastVisible" x-cloak
                 x-transition:enter="transition ease-out duration-300"
