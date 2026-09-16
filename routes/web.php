@@ -132,7 +132,11 @@ Route::prefix('staff')->name('staff.')->group(function () {
 
                 $sinProfesionales = !\App\Models\Profesional::where('empresa_id', $empresaId)->where('activo', true)->exists();
 
-                return view('staff.empresa-dashboard', compact('cantidadRenovaciones', 'sinProfesionales'));
+                $cantidadPedidosPendientes = \App\Models\Pedido::where('empresa_id', $empresaId)
+                    ->where('estado', 'pendiente')
+                    ->count();
+
+                return view('staff.empresa-dashboard', compact('cantidadRenovaciones', 'sinProfesionales', 'cantidadPedidosPendientes'));
             })->name('empresa.dashboard');
             Route::get('/empresa/notificaciones/verificar', [NotificacionController::class, 'verificar'])->name('empresa.notificaciones.verificar');
             Route::post('/empresa/buscar', [BuscadorInternoController::class, 'buscar'])->name('empresa.buscar');
