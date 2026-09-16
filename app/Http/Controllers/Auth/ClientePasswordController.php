@@ -31,7 +31,7 @@ class ClientePasswordController extends Controller
         $mensaje = "Hola! Necesito recuperar mi contraseña de mi cuenta de cliente en EclesTres. Mi email registrado es: {$cliente->email}";
 
         return redirect()->away(
-            WhatsApp::linkChat('3841670079', $mensaje)
+            WhatsApp::linkChat(\App\Support\Contacto::telefono(), $mensaje)
         );
     }
 

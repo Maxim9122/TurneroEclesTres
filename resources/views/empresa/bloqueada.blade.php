@@ -24,7 +24,7 @@
             $mensajeAlta = "Hola! Acabo de registrar mi negocio \"{$empresa->nombre}\" en EclesTres y quisiera solicitar el alta.\n"
                 . "Rubro: {$empresa->rubro}\n"
                 . "Admin: {$admin->nombre} ({$admin->email})";
-            $linkAlta = \App\Support\WhatsApp::linkChat('3841670079', $mensajeAlta);
+            $linkAlta = \App\Support\WhatsApp::linkChat(\App\Support\Contacto::telefono(), $mensajeAlta);
         @endphp
 
         <a href="{{ $linkAlta }}" target="_blank"

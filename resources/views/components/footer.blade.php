@@ -3,7 +3,7 @@
     <p class="mt-1">
         Desarrollado por LunaSoft ·
         <a href="mailto:maxi91luna@gmail.com" class="underline">maxi91luna@gmail.com</a> ·
-        Tel: 3841-670079
+        Tel: {{ \App\Support\Contacto::telefono() }}
     </p>
     <p class="mt-2">
         <a href="{{ route('staff.login') }}" class="underline text-mate-tinta/40">Acceso para negocios registrados</a>
