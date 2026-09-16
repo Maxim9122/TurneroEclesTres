@@ -23,6 +23,24 @@
         @endforeach
     </div>
 
+    <form method="GET" action="{{ route('staff.empresa.pedidos.index') }}" class="flex flex-wrap items-end gap-3 mb-6">
+        @if ($estado)
+            <input type="hidden" name="estado" value="{{ $estado }}">
+        @endif
+        <div>
+            <label class="block text-xs mb-1">Desde</label>
+            <input type="date" name="desde" value="{{ $desde }}" class="rounded-md border border-mate-borde bg-white px-3 py-2 text-sm">
+        </div>
+        <div>
+            <label class="block text-xs mb-1">Hasta</label>
+            <input type="date" name="hasta" value="{{ $hasta }}" class="rounded-md border border-mate-borde bg-white px-3 py-2 text-sm">
+        </div>
+        <button type="submit" class="bg-mate-salvia text-white rounded-md px-4 py-2 text-sm font-medium">Filtrar</button>
+        @if ($desde || $hasta)
+            <a href="{{ route('staff.empresa.pedidos.index', ['estado' => $estado]) }}" class="text-sm text-mate-tinta/60 underline">Limpiar fechas</a>
+        @endif
+    </form>
+
     <div class="space-y-3" x-data="{ modalAbierto: false, formPendiente: null, mensajePendiente: '' }">
         @forelse ($pedidos as $pedido)
             <div class="bg-mate-superficie border rounded-lg p-4
@@ -200,6 +218,10 @@
         @empty
             <p class="text-sm text-mate-tinta/60">No hay pedidos en este estado.</p>
         @endforelse
+
+        <div class="mt-4">
+            {{ $pedidos->onEachSide(1)->links() }}
+        </div>
 
         {{-- Modal de confirmación de cambio de estado --}}
         <div x-show="modalAbierto" x-cloak

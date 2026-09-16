@@ -19,15 +19,20 @@ class PedidoController extends Controller
         $empresa = Auth::guard('web')->user()->empresa;
 
         $estado = $request->query('estado');
+        $desde = $request->query('desde');
+        $hasta = $request->query('hasta');
         $destacar = $request->query('destacar');
 
         $pedidos = $empresa->pedidos()
             ->with(['cliente', 'items.producto', 'direccionEnvio', 'historiales'])
             ->when($estado, fn ($q) => $q->where('estado', $estado))
+            ->when($desde, fn ($q) => $q->whereDate('created_at', '>=', $desde))
+            ->when($hasta, fn ($q) => $q->whereDate('created_at', '<=', $hasta))
             ->orderByDesc('created_at')
-            ->get();
+            ->paginate(10)
+            ->withQueryString();
 
-        return view('staff.pedidos-index', compact('pedidos', 'estado', 'destacar'));
+        return view('staff.pedidos-index', compact('pedidos', 'estado', 'destacar', 'desde', 'hasta'));
     }
 
     public function edit(Pedido $pedido): View
