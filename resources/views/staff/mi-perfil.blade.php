@@ -1,7 +1,8 @@
 <x-layouts.app title="Mi perfil - EclesTres" :logout-route="route('staff.logout')">
     <div class="flex items-center justify-between mb-6">
         <h1 class="font-display text-2xl">Mi perfil</h1>
-        <a href="{{ route('staff.empresa.dashboard') }}" class="text-sm text-mate-salvia">Volver</a>
+        <a href="{{ auth('web')->user()->esSuperAdmin() ? route('staff.plataforma.dashboard') : route('staff.empresa.dashboard') }}"
+        class="text-sm text-mate-salvia">Volver</a>
     </div>
 
     @if (session('status'))
