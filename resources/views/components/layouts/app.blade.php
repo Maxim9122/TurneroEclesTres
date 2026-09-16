@@ -101,6 +101,9 @@
                     } catch (e) {}
                 },
                 verificar() {
+                    const enPantallaTurnos = {{ request()->routeIs('staff.empresa.turnos.index') ? 'true' : 'false' }};
+                    const enPantallaPedidos = {{ request()->routeIs('staff.empresa.pedidos.index') ? 'true' : 'false' }};
+
                     fetch('{{ route('staff.empresa.notificaciones.verificar') }}?desde=' + encodeURIComponent(this.ultimaVerificacion))
                         .then(r => r.json())
                         .then(data => {
@@ -112,13 +115,22 @@
                                 this.mensaje = partes.join(' y ');
                                 this.toastVisible = true;
                                 this.sonar();
-                                setTimeout(() => { this.toastVisible = false; }, 6000);
+
+                                const debeRecargar = (data.turnos > 0 && enPantallaTurnos) || (data.pedidos > 0 && enPantallaPedidos);
+
+                                if (debeRecargar) {
+                                    localStorage.setItem('eclestres_ultima_notif', data.ahora);
+                                    setTimeout(() => { window.location.reload(); }, 7000);
+                                    return;
+                                }
+
+                                setTimeout(() => { this.toastVisible = false; }, 7000);
                             }
                             this.ultimaVerificacion = data.ahora;
                             localStorage.setItem('eclestres_ultima_notif', data.ahora);
                         })
                         .catch(() => {});
-                }
+                },
             }"
             x-init="setInterval(() => verificar(), 25000)"
             @click.window="iniciarAudio()"
