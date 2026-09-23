@@ -143,7 +143,7 @@
                 x-transition:leave="transition ease-in duration-200"
                 x-transition:leave-start="opacity-100"
                 x-transition:leave-end="opacity-0"
-                class="fixed bottom-5 right-5 z-50 bg-mate-tinta text-white rounded-lg shadow-lg px-4 py-3 max-w-xs flex items-center gap-3"
+                class="fixed bottom-[4.25rem] right-5 z-50 bg-mate-tinta text-white rounded-lg shadow-lg px-4 py-3 max-w-xs flex items-center gap-3"
                 style="display: none;">
                 <span class="text-xl">🔔</span>
                 <div class="text-sm">
@@ -153,6 +153,8 @@
                 <button type="button" @click="toastVisible = false" class="text-white/50 text-lg leading-none ml-1">&times;</button>
             </div>
         </div>
+
+        <x-guia-ayuda />
     @endif
     <x-footer />
 </body>
