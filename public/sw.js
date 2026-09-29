@@ -6,7 +6,7 @@
 // - Solo se cachean archivos estáticos: /build (CSS/JS con hash en el nombre), íconos y fuentes.
 // - POST, peticiones a la API de notificaciones, PDFs, imágenes subidas, etc. pasan de largo.
 
-const VERSION = 'v2';
+const VERSION = 'v3';
 const CACHE_ESTATICOS = `eclestres-estaticos-${VERSION}`;
 const CACHE_FUENTES = `eclestres-fuentes-${VERSION}`;
 const OFFLINE_URL = '/offline.html';
@@ -97,24 +97,33 @@ self.addEventListener('push', (event) => {
 self.addEventListener('notificationclick', (event) => {
     event.notification.close();
     const destino = new URL(event.notification.data?.url || '/', self.location.origin).href;
-
-    event.waitUntil((async () => {
-        const ventanas = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
-        const propia = ventanas.find((v) => new URL(v.url).origin === self.location.origin);
-
-        if (propia) {
-            await propia.focus();
-            try {
-                await propia.navigate(destino);
-                return;
-            } catch (e) {
-                // Si no se puede navegar esa ventana, se abre una nueva abajo.
-            }
-        }
-
-        await self.clients.openWindow(destino);
-    })());
+    event.waitUntil(abrirDestino(destino));
 });
+
+async function abrirDestino(destino) {
+    // Solo las ventanas controladas por este service worker se pueden navegar.
+    const ventanas = await self.clients.matchAll({ type: 'window' });
+
+    // Primero navegar (no necesita el permiso del clic) y recién después enfocar,
+    // así si el enfoque falla la ventana igual queda en la sección correcta.
+    for (const ventana of ventanas) {
+        try {
+            const navegada = await ventana.navigate(destino);
+            if (navegada) {
+                try { await navegada.focus(); } catch (e) {}
+                return;
+            }
+        } catch (e) {
+            // Probar con la siguiente ventana o abrir una nueva.
+        }
+    }
+
+    try {
+        await self.clients.openWindow(destino);
+    } catch (e) {
+        console.error('No se pudo abrir el destino del aviso', e);
+    }
+}
 
 async function guardarEnCache(cache, request, respuesta) {
     if (respuesta && (respuesta.ok || respuesta.type === 'opaque')) {

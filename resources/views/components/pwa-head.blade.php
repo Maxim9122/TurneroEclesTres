@@ -9,7 +9,8 @@
 <script>
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-            navigator.serviceWorker.register('/sw.js').catch(() => {});
+            // El ?v= cambia con el contenido de sw.js: evita que un CDN entregue una versión vieja.
+            navigator.serviceWorker.register('/sw.js?v={{ substr(md5_file(public_path('sw.js')), 0, 8) }}').catch(() => {});
         });
     }
 </script>
