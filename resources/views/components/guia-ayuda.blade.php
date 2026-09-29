@@ -18,8 +18,48 @@
                 'Cargá al menos un <strong>profesional activo</strong>: sin profesionales tus clientes no pueden reservar.',
                 'Si vendés productos, creá <strong>categorías</strong> y <strong>productos</strong>.',
                 'Compartí tu <strong>link público o código QR</strong> (en el panel principal).',
+                '<strong>Instalá la app</strong> en tu celular o compu y <strong>activá los avisos</strong> para enterarte al instante de cada turno o pedido (ver las dos secciones de abajo).',
             ],
             'notas' => [],
+        ],
+        'app' => [
+            'titulo' => 'Instalar la app',
+            'icono' => '📲',
+            'solo_admin' => false,
+            'rutas' => [],
+            'link' => null,
+            'resumen' => 'EclesTres se puede instalar como una app en el celular o la compu: queda con su ícono, abre en pantalla completa y carga más rápido. No hace falta bajar nada de ninguna tienda.',
+            'pasos' => [
+                '<strong>Android (Chrome):</strong> entrá a eclestres.com, tocá el menú <strong>⋮</strong> y elegí <strong>Instalar app</strong> (o <em>Agregar a pantalla de inicio</em>).',
+                '<strong>iPhone (Safari):</strong> entrá a eclestres.com, tocá <strong>Compartir</strong> (el cuadrado con la flecha) y elegí <strong>Agregar a inicio</strong>.',
+                '<strong>Compu (Chrome o Edge):</strong> entrá a eclestres.com y tocá el ícono de <strong>instalar</strong> que aparece a la derecha de la barra de direcciones (una pantallita con una flecha).',
+                'Listo: abrí EclesTres desde el ícono nuevo e ingresá con tu email y contraseña como siempre.',
+            ],
+            'notas' => [
+                'Si no hay internet, la app te muestra una pantalla de "Sin conexión" y se recarga sola cuando vuelve la señal.',
+                'Las mejoras del sistema se aplican solas. Si alguna vez algo no se ve actualizado, cerrá la app del todo y volvé a abrirla.',
+            ],
+        ],
+        'avisos' => [
+            'titulo' => 'Avisos de turnos y pedidos',
+            'icono' => '🔔',
+            'solo_admin' => false,
+            'rutas' => $esAdminGuia ? [] : ['staff.empresa.dashboard'],
+            'link' => ['staff.empresa.dashboard', 'Ir al panel para activarlos'],
+            'resumen' => 'Recibí una notificación en el celular o la compu cada vez que un cliente reserva un turno o hace un pedido, aunque la app esté cerrada.',
+            'pasos' => [
+                'En el <strong>panel principal</strong> buscá el recuadro <strong>🔔 Avisos en este dispositivo</strong> y tocá <strong>Activar avisos</strong>.',
+                'Cuando el navegador pregunte, tocá <strong>Permitir</strong>. Te llega enseguida un aviso de prueba para confirmar que funciona (lo podés repetir con <em>Enviar aviso de prueba</em>).',
+                'Desde ese momento, con cada reserva o compra te llega un aviso como <em>"📅 Nuevo turno #25 · Juan · Corte · 30/09 10:30 hs"</em> o <em>"🛒 Nuevo pedido #8"</em>.',
+                '<strong>Tocá el aviso</strong> y se abre EclesTres directo en ese turno o pedido, resaltado.',
+                'Con la app abierta, además aparece un <strong>cartel con sonido</strong> abajo a la derecha, y si estás en Turnos o Pedidos la pantalla se recarga sola.',
+            ],
+            'notas' => [
+                'Se activan por dispositivo: hacelo en cada celular o compu donde quieras recibirlos. Cada persona del equipo activa los suyos con su usuario.',
+                'En iPhone primero hay que instalar la app (ver "Instalar la app"), abrirla desde el ícono y activar los avisos desde ahí.',
+                '¿No llegan? Revisá que las notificaciones del celular o la compu estén permitidas y que no esté activado "No molestar". Si dice "bloqueadas", habilitalas desde el candado 🔒 junto a la dirección y recargá. Si sigue sin andar, tocá Desactivar y volvé a activarlos.',
+                'Los turnos que carga el propio negocio (manuales u orden de llegada) no envían aviso, porque ya los está cargando alguien del equipo.',
+            ],
         ],
         'servicios' => [
             'titulo' => 'Servicios',
@@ -79,6 +119,7 @@
                 'Podés <strong>Cancelar</strong> un turno pendiente o confirmado.',
                 '<strong>+ Orden de llegada</strong>: registra a un cliente que llega sin turno y se atiende en el momento.',
                 'Desde cada turno: <strong>Enviar WhatsApp</strong>, <strong>Enviar comprobante</strong> o <strong>Editar profesional/servicios</strong>.',
+                'Para encontrar un turno por su número, usá el <strong>buscador por N°</strong> del panel principal (opción <em>Turno</em>).',
             ],
             'notas' => [],
         ],
@@ -123,6 +164,7 @@
                 'Podés cancelarlo si no se puede cumplir.',
                 '<strong>Editar venta</strong> permite cambiar productos o la entrega; hay que indicar un <strong>motivo</strong>, que queda en el historial.',
                 '<strong>Enviar remito</strong> le manda el comprobante al cliente.',
+                'Para encontrar un pedido por su número, usá el <strong>buscador por N°</strong> del panel principal (opción <em>Pedido</em>).',
             ],
             'notas' => ['El número rojo en "Ver pedidos" del panel indica cuántos pedidos están pendientes.'],
         ],
@@ -165,20 +207,6 @@
                 '<strong>Pedidos</strong>: total de pedidos, facturado (entregados), cancelados y detalle por estado y método de entrega.',
             ],
             'notas' => [],
-        ],
-        'extras' => [
-            'titulo' => 'Buscador y avisos',
-            'icono' => '🔔',
-            'solo_admin' => false,
-            'rutas' => $esAdminGuia ? [] : ['staff.empresa.dashboard'],
-            'link' => null,
-            'resumen' => 'Herramientas para no perderte nada.',
-            'pasos' => [
-                'En el panel principal podés <strong>buscar un turno o pedido por su N°</strong>.',
-                'Cuando entra un turno o pedido nuevo aparece un <strong>aviso con sonido</strong> abajo a la derecha. Si estás en esa pantalla, se recarga sola.',
-                'Con <strong>Activar avisos</strong> (en el panel principal) recibís una notificación en el celular o la compu aunque la app esté cerrada. Al tocarla te lleva directo al turno o pedido.',
-            ],
-            'notas' => ['Los avisos se activan por dispositivo: hacelo en cada celular o compu donde quieras recibirlos. En iPhone primero hay que instalar la app (Compartir → Agregar a inicio).'],
         ],
         'mi-perfil' => [
             'titulo' => 'Mi perfil',
@@ -295,7 +323,7 @@
                             @foreach ($s['notas'] as $nota)
                                 <p class="text-xs text-mate-tinta/60">💡 {{ $nota }}</p>
                             @endforeach
-                            @if ($s['link'] && !request()->routeIs(...$s['rutas']))
+                            @if ($s['link'] && !request()->routeIs($s['link'][0], ...$s['rutas']))
                                 <a href="{{ route($s['link'][0]) }}" class="inline-block text-mate-salvia font-medium">{{ $s['link'][1] }} →</a>
                             @endif
                         </div>
