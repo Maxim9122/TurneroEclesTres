@@ -31,16 +31,29 @@
             </div>
 
             <div>
-                <label class="block text-sm mb-1">Email</label>
+                <label class="block text-sm mb-1">{{ auth('web')->user()->esSuperAdmin() ? 'Email de ingreso' : 'Email' }}</label>
                 <input type="email" name="email" required value="{{ old('email', auth('web')->user()->email) }}"
                     class="w-full rounded-md border border-mate-borde bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-mate-salvia">
             </div>
+
+            @if (auth('web')->user()->esSuperAdmin())
+                <div>
+                    <label class="block text-sm mb-1">Email de contacto (pie de página)</label>
+                    <input type="email" name="email_contacto" value="{{ old('email_contacto', auth('web')->user()->email_contacto) }}"
+                        placeholder="Si lo dejás vacío se muestra el email de ingreso"
+                        class="w-full rounded-md border border-mate-borde bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-mate-salvia">
+                    <p class="text-xs text-mate-tinta/50 mt-1">Es el que ven todos en el pie de página. No se usa para ingresar.</p>
+                </div>
+            @endif
 
             <div>
                 <label class="block text-sm mb-1">Teléfono (WhatsApp)</label>
                 <input type="tel" name="telefono" value="{{ old('telefono', auth('web')->user()->telefono) }}"
                     placeholder="Ej: 3841670079"
                     class="w-full rounded-md border border-mate-borde bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-mate-salvia">
+                @if (auth('web')->user()->esSuperAdmin())
+                    <p class="text-xs text-mate-tinta/50 mt-1">Se muestra en el pie de página y es el WhatsApp al que llegan los pedidos de recuperación de contraseña y de alta de empresas.</p>
+                @endif
             </div>
 
             <button type="submit"

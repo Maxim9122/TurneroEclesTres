@@ -1,8 +1,11 @@
 <footer class="text-center py-6 px-4 text-xs text-mate-tinta/50 border-t border-mate-borde mt-10">
     <p>EclesTres © {{ now()->year }}</p>
     <p class="mt-1">
+        @php($emailContacto = \App\Support\Contacto::email())
         Desarrollado por LunaSoft ·
-        <a href="mailto:maxi91luna@gmail.com" class="underline">maxi91luna@gmail.com</a> ·
+        @if ($emailContacto)
+            <a href="mailto:{{ $emailContacto }}" class="underline">{{ $emailContacto }}</a> ·
+        @endif
         Tel: {{ \App\Support\Contacto::telefono() }}
     </p>
     <p class="mt-2">

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Staff;
 
 use App\Http\Controllers\Controller;
+use App\Support\Contacto;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -20,13 +21,24 @@ class MiPerfilController extends Controller
     {
         $usuario = Auth::guard('web')->user();
 
-        $data = $request->validate([
+        $reglas = [
             'nombre' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'unique:usuarios,email,' . $usuario->id],
             'telefono' => ['nullable', 'string', 'max:30'],
-        ]);
+        ];
+
+        // Solo el super_admin tiene un email de contacto aparte (se muestra en el pie de página).
+        if ($usuario->esSuperAdmin()) {
+            $reglas['email_contacto'] = ['nullable', 'email', 'max:255'];
+        }
+
+        $data = $request->validate($reglas);
 
         $usuario->update($data);
+
+        if ($usuario->esSuperAdmin()) {
+            Contacto::olvidar();
+        }
 
         return back()->with('status', 'Tus datos fueron actualizados.');
     }

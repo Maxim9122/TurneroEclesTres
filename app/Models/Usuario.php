@@ -16,7 +16,7 @@ class Usuario extends Authenticatable implements MustVerifyEmail, CanResetPasswo
     use HasFactory, Notifiable, CanResetPassword;
 
     protected $fillable = [
-        'empresa_id', 'nombre', 'email', 'password',
+        'empresa_id', 'nombre', 'email', 'email_contacto', 'password',
         'rol', 'activo', 'avatar_path', 'telefono',
     ];
 
