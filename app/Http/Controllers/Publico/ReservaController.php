@@ -8,12 +8,14 @@ use App\Models\Profesional;
 use App\Models\Servicio;
 use App\Models\Turno;
 use App\Services\DisponibilidadService;
+use App\Services\PushService;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use function Illuminate\Support\defer;
 use Illuminate\View\View;
 
 class ReservaController extends Controller
@@ -133,6 +135,9 @@ class ReservaController extends Controller
 
             return $turno;
         });
+
+        // Aviso push al staff, después de responderle al cliente (no demora la reserva).
+        defer(fn () => app(PushService::class)->nuevoTurno($turno));
 
         return redirect()->route('cliente.turnos.confirmado', $turno)
             ->with('status', 'Turno reservado correctamente.');

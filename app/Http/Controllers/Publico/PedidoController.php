@@ -7,10 +7,12 @@ use App\Models\Empresa;
 use App\Models\Pedido;
 use App\Models\Producto;
 use App\Services\CarritoService;
+use App\Services\PushService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use function Illuminate\Support\defer;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
@@ -128,6 +130,9 @@ class PedidoController extends Controller
         }
 
         $this->carrito->vaciar($empresa->id);
+
+        // Aviso push al staff, después de responderle al cliente (no demora la compra).
+        defer(fn () => app(PushService::class)->nuevoPedido($pedido));
 
         return redirect()->route('cliente.pedidos.confirmado', $pedido)
             ->with('status', 'Pedido realizado correctamente.');

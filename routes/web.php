@@ -33,6 +33,7 @@ use App\Http\Controllers\Staff\BuscadorInternoController;
 use App\Http\Controllers\Staff\TurnoRapidoController;
 use App\Http\Controllers\Staff\ClienteBusquedaController;
 use App\Http\Controllers\Staff\NotificacionController;
+use App\Http\Controllers\Staff\PushSubscriptionController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -139,6 +140,11 @@ Route::prefix('staff')->name('staff.')->group(function () {
                 return view('staff.empresa-dashboard', compact('cantidadRenovaciones', 'sinProfesionales', 'cantidadPedidosPendientes'));
             })->name('empresa.dashboard');
             Route::get('/empresa/notificaciones/verificar', [NotificacionController::class, 'verificar'])->name('empresa.notificaciones.verificar');
+
+            // Avisos push (PWA) en el dispositivo
+            Route::post('/empresa/push/suscribir', [PushSubscriptionController::class, 'store'])->name('empresa.push.suscribir');
+            Route::post('/empresa/push/desuscribir', [PushSubscriptionController::class, 'destroy'])->name('empresa.push.desuscribir');
+            Route::post('/empresa/push/probar', [PushSubscriptionController::class, 'probar'])->name('empresa.push.probar');
             Route::post('/empresa/buscar', [BuscadorInternoController::class, 'buscar'])->name('empresa.buscar');
 
             // Pedidos

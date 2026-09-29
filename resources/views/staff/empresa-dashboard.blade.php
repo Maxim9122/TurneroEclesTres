@@ -67,6 +67,8 @@
         </a>
     </div>
 
+    <x-push-avisos />
+
     @if ($usuarioActual->esAdmin())
         <div class="mb-6 bg-mate-superficie border border-mate-borde rounded-md p-4"
             x-data="{ qrAbierto: false }">

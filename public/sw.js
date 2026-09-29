@@ -6,7 +6,7 @@
 // - Solo se cachean archivos estáticos: /build (CSS/JS con hash en el nombre), íconos y fuentes.
 // - POST, peticiones a la API de notificaciones, PDFs, imágenes subidas, etc. pasan de largo.
 
-const VERSION = 'v1';
+const VERSION = 'v2';
 const CACHE_ESTATICOS = `eclestres-estaticos-${VERSION}`;
 const CACHE_FUENTES = `eclestres-fuentes-${VERSION}`;
 const OFFLINE_URL = '/offline.html';
@@ -70,6 +70,50 @@ self.addEventListener('fetch', (event) => {
     }
 
     // Todo lo demás va directo a la red, igual que sin service worker.
+});
+
+// Avisos push de turnos y pedidos nuevos (los envía app/Services/PushService.php).
+self.addEventListener('push', (event) => {
+    let datos = {};
+    try {
+        datos = event.data ? event.data.json() : {};
+    } catch (e) {
+        datos = { body: event.data ? event.data.text() : '' };
+    }
+
+    event.waitUntil(
+        self.registration.showNotification(datos.title || 'EclesTres', {
+            body: datos.body || '',
+            icon: datos.icon || '/icons/icon-192.png',
+            badge: '/icons/icon-192.png',
+            tag: datos.tag,
+            renotify: !!datos.tag,
+            data: { url: datos.url || '/' },
+        })
+    );
+});
+
+// Al tocar el aviso: si la app ya está abierta se lleva esa ventana a la sección; si no, se abre una nueva.
+self.addEventListener('notificationclick', (event) => {
+    event.notification.close();
+    const destino = new URL(event.notification.data?.url || '/', self.location.origin).href;
+
+    event.waitUntil((async () => {
+        const ventanas = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+        const propia = ventanas.find((v) => new URL(v.url).origin === self.location.origin);
+
+        if (propia) {
+            await propia.focus();
+            try {
+                await propia.navigate(destino);
+                return;
+            } catch (e) {
+                // Si no se puede navegar esa ventana, se abre una nueva abajo.
+            }
+        }
+
+        await self.clients.openWindow(destino);
+    })());
 });
 
 async function guardarEnCache(cache, request, respuesta) {

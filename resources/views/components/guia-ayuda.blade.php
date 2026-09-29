@@ -176,8 +176,9 @@
             'pasos' => [
                 'En el panel principal podés <strong>buscar un turno o pedido por su N°</strong>.',
                 'Cuando entra un turno o pedido nuevo aparece un <strong>aviso con sonido</strong> abajo a la derecha. Si estás en esa pantalla, se recarga sola.',
+                'Con <strong>Activar avisos</strong> (en el panel principal) recibís una notificación en el celular o la compu aunque la app esté cerrada. Al tocarla te lleva directo al turno o pedido.',
             ],
-            'notas' => [],
+            'notas' => ['Los avisos se activan por dispositivo: hacelo en cada celular o compu donde quieras recibirlos. En iPhone primero hay que instalar la app (Compartir → Agregar a inicio).'],
         ],
         'mi-perfil' => [
             'titulo' => 'Mi perfil',
