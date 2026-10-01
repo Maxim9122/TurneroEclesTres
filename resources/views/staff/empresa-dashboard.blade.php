@@ -67,6 +67,10 @@
         </a>
     </div>
 
+    <x-instalar-app class="mb-4 max-w-xl">
+        <p class="text-xs text-mate-tinta/60 mt-3">Después de instalarla, abrila desde el ícono, ingresá y tocá <strong>Activar avisos</strong> acá abajo para recibir los turnos y pedidos nuevos.</p>
+    </x-instalar-app>
+
     <x-push-avisos />
 
     @if ($usuarioActual->esAdmin())

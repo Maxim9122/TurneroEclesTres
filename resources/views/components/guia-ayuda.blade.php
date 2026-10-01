@@ -31,11 +31,12 @@
             'resumen' => 'EclesTres se puede instalar como una app en el celular o la compu: queda con su ícono, abre en pantalla completa y carga más rápido. No hace falta bajar nada de ninguna tienda.',
             'pasos' => [
                 '<strong>Android (Chrome):</strong> entrá a eclestres.com, tocá el menú <strong>⋮</strong> y elegí <strong>Instalar app</strong> (o <em>Agregar a pantalla de inicio</em>).',
-                '<strong>iPhone (Safari):</strong> entrá a eclestres.com, tocá <strong>Compartir</strong> (el cuadrado con la flecha) y elegí <strong>Agregar a inicio</strong>.',
-                '<strong>Compu (Chrome o Edge):</strong> entrá a eclestres.com y tocá el ícono de <strong>instalar</strong> que aparece a la derecha de la barra de direcciones (una pantallita con una flecha).',
+                '<strong>iPhone / iPad (Safari):</strong> entrá a eclestres.com, tocá <strong>Compartir</strong> (el cuadrado con la flecha: abajo en iPhone, arriba en iPad), deslizá y elegí <strong>Agregar a inicio</strong>. Si no aparece, tocá <em>Editar acciones</em> y agregala.',
+                '<strong>Compu (Chrome o Edge):</strong> entrá a eclestres.com y tocá el ícono de <strong>instalar</strong> a la derecha de la barra de direcciones. Si no aparece: en Chrome, menú <strong>⋮ → Transmitir, guardar y compartir → Instalar página como app</strong>; en Edge, <strong>⋯ → Aplicaciones → Instalar este sitio como una aplicación</strong>.',
                 'Listo: abrí EclesTres desde el ícono nuevo e ingresá con tu email y contraseña como siempre.',
             ],
             'notas' => [
+                'En el panel principal también tenés el recuadro "Instalá EclesTres" con estos pasos y, en Android y compu, un botón "Instalar ahora".',
                 'Si no hay internet, la app te muestra una pantalla de "Sin conexión" y se recarga sola cuando vuelve la señal.',
                 'Las mejoras del sistema se aplican solas. Si alguna vez algo no se ve actualizado, cerrá la app del todo y volvé a abrirla.',
             ],

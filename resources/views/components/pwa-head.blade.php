@@ -7,6 +7,16 @@
 <meta name="apple-mobile-web-app-title" content="EclesTres">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <script>
+    // Instalación con un toque (Android / compu): se guarda el pedido del navegador para el
+    // botón "Instalar ahora" del recuadro de instalación (componente instalar-app). Solo donde está ese recuadro se
+    // reemplaza el cartel propio de Chrome; en el resto de las páginas se comporta como siempre.
+    window.addEventListener('beforeinstallprompt', (e) => {
+        if (!document.querySelector('[data-instalar-app]')) return;
+        e.preventDefault();
+        window.eclesInstalar = e;
+        window.dispatchEvent(new Event('eclestres-instalable'));
+    });
+
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
             // El ?v= cambia con el contenido de sw.js: evita que un CDN entregue una versión vieja.

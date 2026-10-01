@@ -73,6 +73,7 @@
     </section>
 
     <main class="max-w-4xl mx-auto px-4 py-8 sm:px-6">
+        <x-instalar-app class="mb-6" />
         @if ($empresas->isEmpty())
             <p class="text-sm text-mate-tinta/60 text-center py-10">
                 No encontramos negocios con esos filtros. Probá con otra búsqueda.

@@ -77,13 +77,13 @@ Route::prefix('staff')->name('staff.')->group(function () {
     Route::post('/olvide-password', [StaffPasswordController::class, 'sendLink'])->name('password.email');
     Route::get('/resetear-password/{token}', [StaffPasswordController::class, 'showReset'])->name('password.reset');
     Route::post('/resetear-password', [StaffPasswordController::class, 'reset'])->name('password.update');
-    Route::get('/login', [StaffAuthController::class, 'showLogin'])->name('login');
-    Route::post('/login', [StaffAuthController::class, 'login']);
+    Route::get('/login', [StaffAuthController::class, 'showLogin'])->name('login')->middleware('guest:web');
+    Route::post('/login', [StaffAuthController::class, 'login'])->middleware('guest:web');
     Route::post('/logout', [StaffAuthController::class, 'logout'])->name('logout');
 
     // --- Registro de empresa nueva (público) ---
-    Route::get('/registro-empresa', [EmpresaRegisterController::class, 'showRegister'])->name('registro-empresa');
-    Route::post('/registro-empresa', [EmpresaRegisterController::class, 'register']);
+    Route::get('/registro-empresa', [EmpresaRegisterController::class, 'showRegister'])->name('registro-empresa')->middleware('guest:web');
+    Route::post('/registro-empresa', [EmpresaRegisterController::class, 'register'])->middleware('guest:web');
 
     // --- Todo lo de acá abajo requiere estar logueado y empresa activa ---
     Route::middleware(['auth:web', 'empresa.activa'])->group(function () {
@@ -255,10 +255,10 @@ Route::prefix('cuenta')->name('cliente.')->group(function () {
     Route::post('/olvide-password', [ClientePasswordController::class, 'sendLink'])->name('password.email');
     Route::get('/resetear-password/{token}', [ClientePasswordController::class, 'showReset'])->name('password.reset');
     Route::post('/resetear-password', [ClientePasswordController::class, 'reset'])->name('password.update');
-    Route::get('/login', [ClienteAuthController::class, 'showLogin'])->name('login');
-    Route::post('/login', [ClienteAuthController::class, 'login']);
-    Route::get('/registro', [ClienteAuthController::class, 'showRegister'])->name('register');
-    Route::post('/registro', [ClienteAuthController::class, 'register']);
+    Route::get('/login', [ClienteAuthController::class, 'showLogin'])->name('login')->middleware('guest:cliente');
+    Route::post('/login', [ClienteAuthController::class, 'login'])->middleware('guest:cliente');
+    Route::get('/registro', [ClienteAuthController::class, 'showRegister'])->name('register')->middleware('guest:cliente');
+    Route::post('/registro', [ClienteAuthController::class, 'register'])->middleware('guest:cliente');
     Route::post('/logout', [ClienteAuthController::class, 'logout'])->name('logout');
 
     // --- Requiere estar logueado como cliente ---
