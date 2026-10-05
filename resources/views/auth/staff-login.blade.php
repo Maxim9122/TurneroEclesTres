@@ -33,6 +33,8 @@
         </button>
     </form>
 
+    <x-huella-login />
+
     <p class="text-sm text-center text-mate-tinta/70 mt-6">
         ¿Tenés un salón y todavía no estás en EclesTres?
         <a href="{{ route('staff.registro-empresa') }}" class="text-mate-salvia font-medium">Registrá tu empresa</a>

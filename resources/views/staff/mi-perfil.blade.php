@@ -91,5 +91,7 @@
                 Cambiar contraseña
             </button>
         </form>
+
+        <x-huella-perfil />
     </div>
 </x-layouts.app>

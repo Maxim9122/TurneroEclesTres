@@ -6,6 +6,7 @@ use App\Http\Controllers\Staff\EmpresaAdminController;
 use App\Http\Controllers\Auth\ClienteAuthController;
 use App\Http\Controllers\Auth\EmpresaRegisterController;
 use App\Http\Controllers\Auth\StaffAuthController;
+use App\Http\Controllers\Auth\StaffWebauthnController;
 use App\Http\Controllers\Staff\EmpresaDireccionController;
 use App\Http\Controllers\Staff\OperadorController;
 use App\Http\Controllers\Staff\ServicioController;
@@ -79,6 +80,12 @@ Route::prefix('staff')->name('staff.')->group(function () {
     Route::post('/resetear-password', [StaffPasswordController::class, 'reset'])->name('password.update');
     Route::get('/login', [StaffAuthController::class, 'showLogin'])->name('login')->middleware('guest:web');
     Route::post('/login', [StaffAuthController::class, 'login'])->middleware('guest:web');
+
+    // Ingreso con huella / rostro / patrón (llaves de acceso)
+    Route::middleware(['guest:web', 'throttle:20,1'])->group(function () {
+        Route::post('/login/huella/opciones', [StaffWebauthnController::class, 'opcionesIngreso'])->name('huella.ingreso.opciones');
+        Route::post('/login/huella', [StaffWebauthnController::class, 'ingresar'])->name('huella.ingreso');
+    });
     Route::post('/logout', [StaffAuthController::class, 'logout'])->name('logout');
 
     // --- Registro de empresa nueva (público) ---
@@ -92,6 +99,9 @@ Route::prefix('staff')->name('staff.')->group(function () {
         Route::get('/mi-perfil', [MiPerfilController::class, 'edit'])->name('mi-perfil.edit');
         Route::put('/mi-perfil', [MiPerfilController::class, 'update'])->name('mi-perfil.update');
         Route::put('/mi-perfil/password', [MiPerfilController::class, 'actualizarPassword'])->name('mi-perfil.password');
+        Route::post('/mi-perfil/huella/opciones', [StaffWebauthnController::class, 'opcionesRegistro'])->name('huella.registro.opciones')->middleware('throttle:20,1');
+        Route::post('/mi-perfil/huella', [StaffWebauthnController::class, 'registrar'])->name('huella.registro')->middleware('throttle:20,1');
+        Route::delete('/mi-perfil/huella/{credencial}', [StaffWebauthnController::class, 'eliminar'])->name('huella.eliminar');
 
         // ==============================
         // SOLO SUPER_ADMIN (dueño de la plataforma)

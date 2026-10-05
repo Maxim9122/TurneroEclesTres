@@ -215,12 +215,19 @@
             'solo_admin' => false,
             'rutas' => ['staff.mi-perfil.*'],
             'link' => ['staff.mi-perfil.edit', 'Ir a Mi perfil'],
-            'resumen' => 'Tus datos personales y tu contraseña.',
+            'resumen' => 'Tus datos personales, tu contraseña y el ingreso con huella.',
             'pasos' => [
                 'Actualizá nombre, email y <strong>teléfono (WhatsApp)</strong>.',
                 'Para cambiar la contraseña necesitás la actual.',
+                '<strong>Ingreso con huella, rostro o patrón:</strong> en el celular o compu donde quieras usarlo, entrá a Mi perfil y tocá <strong>Activar en este dispositivo</strong>. Confirmá con tu huella, rostro, patrón o PIN.',
+                'La próxima vez, en la pantalla de ingreso tocá <strong>Ingresar con huella, rostro o patrón</strong>: entrás sin escribir la contraseña.',
+                'En Mi perfil ves la lista de dispositivos activados y podés <strong>Quitar</strong> cualquiera (por ejemplo, si perdiste el celular).',
             ],
-            'notas' => [],
+            'notas' => [
+                'Tu huella nunca sale del dispositivo y solo sirve para tu cuenta: otra persona no puede usar su huella para entrar a la tuya.',
+                'Ojo: cualquier huella o patrón que desbloquee ESE dispositivo puede usarlo. Activalo solo en celulares o compus personales.',
+                'La contraseña sigue funcionando siempre, por si cambiás de dispositivo.',
+            ],
         ],
     ];
 
