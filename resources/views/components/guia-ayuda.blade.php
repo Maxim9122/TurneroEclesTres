@@ -18,7 +18,7 @@
                 'Cargá al menos un <strong>profesional activo</strong>: sin profesionales tus clientes no pueden reservar.',
                 'Si vendés productos, creá <strong>categorías</strong> y <strong>productos</strong>.',
                 'Compartí tu <strong>link público o código QR</strong> (en el panel principal).',
-                '<strong>Instalá la app</strong> en tu celular o compu y <strong>activá los avisos</strong> para enterarte al instante de cada turno o pedido (ver las dos secciones de abajo).',
+                '<strong>Instalá la app</strong> en tu celular o compu, <strong>activá los avisos</strong> para enterarte al instante de cada turno o pedido y, si querés, el <strong>ingreso con huella</strong> para no escribir la contraseña (ver las secciones de abajo).',
             ],
             'notas' => [],
         ],
@@ -39,6 +39,26 @@
                 'En el panel principal también tenés el recuadro "Instalá EclesTres" con estos pasos y, en Android y compu, un botón "Instalar ahora".',
                 'Si no hay internet, la app te muestra una pantalla de "Sin conexión" y se recarga sola cuando vuelve la señal.',
                 'Las mejoras del sistema se aplican solas. Si alguna vez algo no se ve actualizado, cerrá la app del todo y volvé a abrirla.',
+            ],
+        ],
+        'huella' => [
+            'titulo' => 'Ingresar con huella, rostro o patrón',
+            'icono' => '🔐',
+            'solo_admin' => false,
+            'rutas' => [],
+            'link' => ['staff.mi-perfil.edit', 'Ir a Mi perfil para activarlo'],
+            'resumen' => 'Entrá al sistema sin escribir la contraseña, usando el mismo desbloqueo de tu celular o compu: huella, rostro, patrón o PIN.',
+            'pasos' => [
+                '<strong>Activalo (una vez por dispositivo):</strong> desde el celular o compu donde lo quieras usar, ingresá con tu contraseña y andá a <strong>Mi perfil</strong>.',
+                'En el recuadro <strong>Ingreso con huella, rostro o patrón</strong> tocá <strong>Activar en este dispositivo</strong> y confirmá con tu huella, rostro, patrón o PIN. Vas a ver el dispositivo en la lista (por ejemplo "Android · Chrome").',
+                '<strong>Para ingresar:</strong> en la pantalla de ingreso tocá <strong>Ingresar con huella, rostro o patrón</strong>, poné la huella y entrás directo a tu panel.',
+                '<strong>Si perdés o cambiás el celular:</strong> en Mi perfil tocá <strong>Quitar</strong> junto a ese dispositivo y deja de servir para entrar.',
+            ],
+            'notas' => [
+                'Es seguro: tu huella nunca sale del dispositivo y la llave solo sirve para TU cuenta. Otra persona no puede usar su huella para entrar a la tuya.',
+                'Ojo: cualquier huella, rostro o patrón que desbloquee ESE dispositivo puede usarlo. Activalo solo en celulares o compus personales, no en una compu compartida del negocio.',
+                'Cada persona del equipo lo activa con su propio usuario. Si usás varios dispositivos, activalo en cada uno.',
+                'La contraseña sigue funcionando siempre. Si el botón no aparece, actualizá el navegador (Chrome, Edge o Safari) o ingresá con tu contraseña.',
             ],
         ],
         'avisos' => [
@@ -219,15 +239,9 @@
             'pasos' => [
                 'Actualizá nombre, email y <strong>teléfono (WhatsApp)</strong>.',
                 'Para cambiar la contraseña necesitás la actual.',
-                '<strong>Ingreso con huella, rostro o patrón:</strong> en el celular o compu donde quieras usarlo, entrá a Mi perfil y tocá <strong>Activar en este dispositivo</strong>. Confirmá con tu huella, rostro, patrón o PIN.',
-                'La próxima vez, en la pantalla de ingreso tocá <strong>Ingresar con huella, rostro o patrón</strong>: entrás sin escribir la contraseña.',
-                'En Mi perfil ves la lista de dispositivos activados y podés <strong>Quitar</strong> cualquiera (por ejemplo, si perdiste el celular).',
+                'Desde acá también activás o quitás el <strong>ingreso con huella</strong> (ver la sección "Ingresar con huella, rostro o patrón").',
             ],
-            'notas' => [
-                'Tu huella nunca sale del dispositivo y solo sirve para tu cuenta: otra persona no puede usar su huella para entrar a la tuya.',
-                'Ojo: cualquier huella o patrón que desbloquee ESE dispositivo puede usarlo. Activalo solo en celulares o compus personales.',
-                'La contraseña sigue funcionando siempre, por si cambiás de dispositivo.',
-            ],
+            'notas' => [],
         ],
     ];
 
