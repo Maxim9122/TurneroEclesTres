@@ -87,8 +87,12 @@ class TurnoController extends Controller
         $servicios = $empresa->servicios()->where('activo', true)->with('adicionalesActivos')->orderBy('nombre')->get();
         $serviciosSeleccionados = $turno->servicios->pluck('id')->all();
         $adicionalesSeleccionados = $turno->adicionales->pluck('servicio_adicional_id')->filter()->all();
+        $preciosAdicionales = $turno->adicionales->whereNotNull('servicio_adicional_id')
+            ->pluck('precio_al_momento', 'servicio_adicional_id')->all();
 
-        return view('staff.turnos-edit', compact('turno', 'profesionales', 'servicios', 'serviciosSeleccionados', 'adicionalesSeleccionados'));
+        return view('staff.turnos-edit', compact(
+            'turno', 'profesionales', 'servicios', 'serviciosSeleccionados', 'adicionalesSeleccionados', 'preciosAdicionales'
+        ));
     }
 
     public function update(Request $request, Turno $turno): RedirectResponse
@@ -103,7 +107,9 @@ class TurnoController extends Controller
             'servicios.*' => ['integer', 'exists:servicios,id'],
             'adicionales' => ['nullable', 'array'],
             'adicionales.*' => ['integer'],
-        ]);
+            'precios_adicionales' => ['nullable', 'array'],
+            'precios_adicionales.*' => ['nullable', 'numeric', 'min:0', 'max:99999999'],
+        ], [], ['precios_adicionales.*' => 'precio final del adicional']);
 
         $seleccion = SeleccionServicios::desde($turno->empresa_id, $data['servicios'], $data['adicionales'] ?? [], soloActivos: false);
 
@@ -114,7 +120,7 @@ class TurnoController extends Controller
         try {
             DB::transaction(function () use ($turno, $data, $seleccion) {
                 // Lo que ya tenía el turno conserva su precio; solo lo nuevo toma el precio actual.
-                $seleccion->sincronizar($turno);
+                $seleccion->sincronizar($turno, $data['precios_adicionales'] ?? []);
 
                 $turno->refresh();
 

@@ -25,7 +25,10 @@
                 <p><strong>Hora:</strong> {{ substr($turno->hora_inicio, 0, 5) }} a {{ substr($turno->hora_fin, 0, 5) }}</p>
                 <p><strong>Servicios:</strong> {{ $turno->descripcionServicios() }}</p>
                 <p><strong>Profesional:</strong> {{ $turno->profesional->nombre ?? 'Sin preferencia (a asignar)' }}</p>
-                <p><strong>Total:</strong> ${{ number_format($turno->precioTotal(), 2, ',', '.') }}</p>
+                <p><strong>Total{{ $turno->adicionales->isNotEmpty() ? ' aproximado' : '' }}:</strong> ${{ number_format($turno->precioTotal(), 2, ',', '.') }}</p>
+                @if ($turno->adicionales->isNotEmpty())
+                    <p class="text-xs text-mate-tinta/60">El precio de los adicionales puede variar según la complejidad; el precio final lo acordás con el profesional.</p>
+                @endif
             </div>
 
             <a href="{{ route('cliente.home') }}" class="text-sm text-mate-salvia font-medium">Volver a mi cuenta</a>

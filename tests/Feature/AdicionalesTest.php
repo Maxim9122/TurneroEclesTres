@@ -259,6 +259,77 @@ class AdicionalesTest extends TestCase
             ->assertSee('$3.500,00', false);  // 50% de comisión
     }
 
+    // ---------------------------------------------------------------- Precio aproximado / final
+
+    public function test_el_cliente_ve_el_precio_del_adicional_como_aproximado(): void
+    {
+        $this->get(route('publico.empresa', $this->empresa))
+            ->assertOk()->assertSee('aprox.')->assertSee('Precio aproximado: puede variar según la complejidad');
+
+        $this->actingAs($this->cliente, 'cliente')
+            ->get(route('publico.reserva.iniciar', $this->empresa) . "?servicios[]={$this->corte->id}&adicionales[]={$this->diseno->id}")
+            ->assertOk()->assertSee('aprox.')->assertSee('el precio final lo acordás con el profesional');
+
+        // Sin adicionales no aparece la aclaración
+        $this->actingAs($this->cliente, 'cliente')
+            ->get(route('publico.reserva.iniciar', $this->empresa) . "?servicios[]={$this->corte->id}")
+            ->assertOk()->assertDontSee('el precio final lo acordás con el profesional');
+    }
+
+    public function test_el_staff_fija_el_precio_final_de_un_adicional_ya_reservado(): void
+    {
+        $this->reservar([$this->corte->id], [$this->diseno->id]); // Diseño aprox. $2.000
+        $turno = Turno::first();
+
+        $this->actingAs($this->admin, 'web')->get(route('staff.empresa.turnos.edit', $turno))
+            ->assertOk()->assertSee('Precio final');
+
+        $this->actingAs($this->admin, 'web')->put(route('staff.empresa.turnos.update', $turno), [
+            'profesional_id' => $this->profesional->id,
+            'servicios' => [$this->corte->id],
+            'adicionales' => [$this->diseno->id],
+            'precios_adicionales' => [$this->diseno->id => 3500], // diseño más complejo
+        ])->assertSessionHasNoErrors();
+
+        $turno = Turno::with(['servicios', 'adicionales'])->first();
+        $this->assertEquals(8500, $turno->precioTotal());
+        $this->assertEquals(2000, $this->diseno->fresh()->precio, 'El precio de referencia del catálogo no cambia');
+
+        $turno->update(['estado' => 'completado']);
+        $this->actingAs($this->admin, 'web')
+            ->get(route('staff.empresa.reportes.comisiones', ['desde' => now()->subDay()->toDateString(), 'hasta' => now()->addDays(2)->toDateString()]))
+            ->assertSee('$8.500,00', false)->assertSee('$4.250,00', false);
+    }
+
+    public function test_el_staff_agrega_un_adicional_con_su_precio_final(): void
+    {
+        $this->reservar([$this->corte->id]);
+        $turno = Turno::first();
+
+        $this->actingAs($this->admin, 'web')->put(route('staff.empresa.turnos.update', $turno), [
+            'servicios' => [$this->corte->id],
+            'adicionales' => [$this->lineas->id],
+            'precios_adicionales' => [$this->lineas->id => 1500, $this->diseno->id => 99999], // Diseño no está marcado: se ignora
+        ])->assertSessionHasNoErrors();
+
+        $turno = Turno::with(['servicios', 'adicionales'])->first();
+        $this->assertSame(['Líneas'], $turno->adicionales->pluck('nombre_al_momento')->all());
+        $this->assertEquals(6500, $turno->precioTotal());
+    }
+
+    public function test_precio_final_negativo_se_rechaza(): void
+    {
+        $this->reservar([$this->corte->id], [$this->diseno->id]);
+
+        $this->actingAs($this->admin, 'web')->put(route('staff.empresa.turnos.update', Turno::first()), [
+            'servicios' => [$this->corte->id],
+            'adicionales' => [$this->diseno->id],
+            'precios_adicionales' => [$this->diseno->id => -100],
+        ])->assertSessionHasErrors('precios_adicionales.' . $this->diseno->id);
+
+        $this->assertEquals(7000, Turno::with(['servicios', 'adicionales'])->first()->precioTotal());
+    }
+
     public function test_la_agenda_y_editar_muestran_los_adicionales(): void
     {
         $this->reservar([$this->corte->id], [$this->diseno->id]);

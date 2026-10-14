@@ -35,10 +35,16 @@
             <label class="block text-sm mb-2">Servicios</label>
             <x-servicios-selector :servicios="$servicios"
                 :seleccionados="old('servicios', $serviciosSeleccionados)"
-                :adicionales-seleccionados="old('adicionales', $adicionalesSeleccionados)" />
+                :adicionales-seleccionados="old('adicionales', $adicionalesSeleccionados)"
+                :editar-precios="true"
+                :precios="old('precios_adicionales', $preciosAdicionales)" />
             <p class="text-xs text-mate-tinta/50 mt-2">
                 El horario de fin se recalcula automáticamente según los servicios y adicionales que dejes marcados.
                 Lo que ya tenía el turno mantiene el precio con el que se reservó.
+            </p>
+            <p class="text-xs text-mate-tinta/50 mt-1">
+                El precio de los adicionales es aproximado: una vez acordado con el cliente según la complejidad,
+                cargá el <strong>precio final</strong> y se actualizan el total, el comprobante y la comisión.
             </p>
         </div>
 

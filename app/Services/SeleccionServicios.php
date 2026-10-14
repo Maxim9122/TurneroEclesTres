@@ -79,8 +79,11 @@ class SeleccionServicios
     /**
      * Turno existente (edición del staff): lo que sigue elegido conserva el precio con el que se
      * reservó; solo lo nuevo toma el precio actual.
+     *
+     * @param  array  $preciosFinales  [id del adicional => precio acordado con el cliente]. El precio
+     *                                 del catálogo es aproximado; acá el staff fija el definitivo.
      */
-    public function sincronizar(Turno $turno): void
+    public function sincronizar(Turno $turno, array $preciosFinales = []): void
     {
         $turno->loadMissing(['servicios', 'adicionales']);
 
@@ -108,25 +111,40 @@ class SeleccionServicios
 
             if (!$sigueElServicio || !$sigueElegido) {
                 $existente->delete();
+                continue;
+            }
+
+            $precioFinal = $this->precioFinal($preciosFinales, $existente->servicio_adicional_id);
+            if ($precioFinal !== null && (float) $existente->precio_al_momento !== $precioFinal) {
+                $existente->update(['precio_al_momento' => $precioFinal]);
             }
         }
 
         $yaEstaban = $turno->adicionales->pluck('servicio_adicional_id')->filter()->all();
 
         foreach ($this->adicionales->whereNotIn('id', $yaEstaban) as $adicional) {
-            $this->crearAdicional($turno, $adicional);
+            $this->crearAdicional($turno, $adicional, $this->precioFinal($preciosFinales, $adicional->id));
         }
 
         $turno->unsetRelation('servicios')->unsetRelation('adicionales');
     }
 
-    private function crearAdicional(Turno $turno, ServicioAdicional $adicional): void
+    private function precioFinal(array $precios, ?int $adicionalId): ?float
+    {
+        if ($adicionalId === null || !isset($precios[$adicionalId]) || $precios[$adicionalId] === '') {
+            return null;
+        }
+
+        return max(0, round((float) $precios[$adicionalId], 2));
+    }
+
+    private function crearAdicional(Turno $turno, ServicioAdicional $adicional, ?float $precio = null): void
     {
         $turno->adicionales()->create([
             'servicio_id' => $adicional->servicio_id,
             'servicio_adicional_id' => $adicional->id,
             'nombre_al_momento' => $adicional->nombre,
-            'precio_al_momento' => $adicional->precio,
+            'precio_al_momento' => $precio ?? $adicional->precio,
             'duracion_al_momento' => $adicional->duracion_minutos,
         ]);
     }

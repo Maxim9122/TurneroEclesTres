@@ -107,6 +107,8 @@
     </div>
     <p class="text-xs text-mate-tinta/50 mb-2">
         Extras que el cliente puede sumar a este servicio al reservar, con su precio y minutos extra (si suma tiempo).
+        El cliente ve el precio como <strong>aproximado</strong>: una vez acordado según la complejidad, el precio final
+        se carga en el turno desde <em>Editar profesional/servicios</em>.
     </p>
 
     <template x-for="(adicional, i) in adicionales" :key="i">

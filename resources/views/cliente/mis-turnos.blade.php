@@ -23,6 +23,9 @@
                         <p class="text-xs text-mate-tinta/60">
                             {{ $turno->descripcionServicios() }}
                             · ${{ number_format($turno->precioTotal(), 2, ',', '.') }}
+                            @if ($turno->adicionales->isNotEmpty())
+                                <span title="El precio de los adicionales puede variar según la complejidad; el precio final lo acordás con el profesional.">aprox.</span>
+                            @endif
                         </p>
                         <p class="text-xs text-mate-tinta/60">
                             Con {{ $turno->profesional->nombre ?? 'profesional a asignar' }}

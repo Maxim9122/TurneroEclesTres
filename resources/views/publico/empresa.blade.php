@@ -126,9 +126,10 @@
                                                 <span class="text-xs text-mate-tinta/50">(+{{ $adicional->duracion_minutos }} min)</span>
                                             @endif
                                         </span>
-                                        <span class="text-sm text-mate-tinta/80">+${{ number_format($adicional->precio, 2, ',', '.') }}</span>
+                                        <span class="text-sm text-mate-tinta/80 whitespace-nowrap">+${{ number_format($adicional->precio, 2, ',', '.') }} <span class="text-xs text-mate-tinta/50">aprox.</span></span>
                                     </label>
                                 @endforeach
+                                <p class="text-xs text-mate-tinta/50 pb-1">Precio aproximado: puede variar según la complejidad y lo confirmás con el profesional.</p>
                             </div>
                         @endif
                     @endforeach

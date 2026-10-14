@@ -61,7 +61,15 @@
         @endforeach
         <p class="font-medium text-mate-tinta mt-1">
             {{ $seleccion->duracionMinutos() }} min · ${{ number_format($seleccion->precio(), 2, ',', '.') }}
+            @if ($seleccion->adicionales->isNotEmpty())
+                <span class="text-xs font-normal text-mate-tinta/60">aprox.</span>
+            @endif
         </p>
+        @if ($seleccion->adicionales->isNotEmpty())
+            <p class="text-xs text-mate-tinta/60 mt-1">
+                El precio de los adicionales es aproximado: puede variar según la complejidad y el precio final lo acordás con el profesional.
+            </p>
+        @endif
         <p class="mt-1">
         @if ($profesional)
             Con {{ $profesional->nombre }}
