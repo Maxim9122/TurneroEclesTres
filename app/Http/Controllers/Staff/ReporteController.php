@@ -21,7 +21,7 @@ class ReporteController extends Controller
                 $q->where('estado', 'completado')
                     ->whereDate('fecha', '>=', $desde)
                     ->whereDate('fecha', '<=', $hasta)
-                    ->with(['servicios', 'cliente'])
+                    ->with(['servicios', 'adicionales', 'cliente'])
                     ->orderBy('fecha')
                     ->orderBy('hora_inicio');
             }])

@@ -33,6 +33,17 @@ class Servicio extends Model
         return $this->belongsToMany(Profesional::class, 'servicio_profesional');
     }
 
+    /** Extras opcionales del servicio (ej: diseño, líneas). Incluye los pausados. */
+    public function adicionales(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(ServicioAdicional::class)->orderBy('id');
+    }
+
+    public function adicionalesActivos(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->adicionales()->where('activo', true);
+    }
+
     public function imagenes(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(ServicioImagen::class)->orderBy('orden');

@@ -25,6 +25,9 @@
                     <p class="font-medium text-sm">{{ $servicio->nombre }}</p>
                     <p class="text-xs text-mate-tinta/60">
                         {{ $servicio->duracion_minutos }} min · ${{ number_format($servicio->precio, 2, ',', '.') }}
+                        @if ($servicio->adicionales->isNotEmpty())
+                            · <span title="{{ $servicio->adicionales->pluck('nombre')->implode(', ') }}">{{ $servicio->adicionales->count() }} {{ $servicio->adicionales->count() === 1 ? 'adicional' : 'adicionales' }}</span>
+                        @endif
                     </p>
                 </div>
 

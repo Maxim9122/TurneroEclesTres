@@ -18,16 +18,16 @@
     <div class="bg-mate-superficie border border-mate-borde rounded-lg p-5 max-w-md mx-auto"
         x-data="{
             servicioIds: [{{ $servicioPreseleccionado ?: '' }}],
+            adicionalIds: [],
             profesionalId: '',
             fecha: '',
             hora: '',
             slots: [],
             cargando: false,
             error: '',
-            toggleServicio(id) {
-                this.servicioIds.includes(id)
-                    ? this.servicioIds = this.servicioIds.filter(s => s !== id)
-                    : this.servicioIds.push(id);
+            cambiarSeleccion(detalle) {
+                this.servicioIds = detalle.servicios;
+                this.adicionalIds = detalle.adicionales;
                 this.buscarHorarios();
             },
             buscarHorarios() {
@@ -38,6 +38,7 @@
                 const params = new URLSearchParams();
                 params.append('fecha', this.fecha);
                 this.servicioIds.forEach(id => params.append('servicios[]', id));
+                this.adicionalIds.forEach(id => params.append('adicionales[]', id));
                 if (this.profesionalId) params.append('profesional', this.profesionalId);
 
                 fetch('{{ route('publico.reserva.horarios', $empresa) }}?' + params.toString())
@@ -45,24 +46,11 @@
                     .then(data => { this.slots = data.slots; this.cargando = false; })
                     .catch(() => { this.error = 'No pudimos cargar los horarios. Probá de nuevo.'; this.cargando = false; });
             }
-        }">
+        }"
+        @servicios-cambiaron="cambiarSeleccion($event.detail)">
 
         <p class="text-sm font-medium mb-2">Servicios</p>
-        <div class="space-y-2 mb-4">
-            @foreach ($servicios as $servicio)
-                <label class="flex items-center justify-between bg-white border border-mate-borde rounded-md px-3 py-2 text-sm cursor-pointer">
-                    <span class="flex items-center gap-2">
-                        <input type="checkbox" value="{{ $servicio->id }}"
-                            @checked($servicio->id === $servicioPreseleccionado)
-                            @change="toggleServicio({{ $servicio->id }})"
-                            class="rounded border-mate-borde">
-                        {{ $servicio->nombre }}
-                        <span class="text-xs text-mate-tinta/50">({{ $servicio->duracion_minutos }} min)</span>
-                    </span>
-                    <span>${{ number_format($servicio->precio, 2, ',', '.') }}</span>
-                </label>
-            @endforeach
-        </div>
+        <x-servicios-selector :servicios="$servicios" :seleccionados="[$servicioPreseleccionado]" class="space-y-2 mb-4" />
 
         <p class="text-sm font-medium mb-2">Profesional (opcional)</p>
         <select x-model="profesionalId" @change="buscarHorarios()"
@@ -99,6 +87,9 @@
             <input type="hidden" name="hora" x-bind:value="hora">
             <template x-for="id in servicioIds" :key="id">
                 <input type="hidden" name="servicios[]" x-bind:value="id">
+            </template>
+            <template x-for="id in adicionalIds" :key="'a' + id">
+                <input type="hidden" name="adicionales[]" x-bind:value="id">
             </template>
             <input type="hidden" name="profesional" x-bind:value="profesionalId">
 

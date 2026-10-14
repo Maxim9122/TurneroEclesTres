@@ -65,7 +65,7 @@
                                         </div>
                                         <p class="text-xs text-mate-tinta/60 mt-1">
                                             {{ $turno->cliente->nombre ?? 'Cliente' }} ·
-                                            {{ $turno->servicios->pluck('nombre')->implode(' + ') }}
+                                            {{ $turno->descripcionServicios() }}
                                         </p>
                                     </div>
                                 @endforeach

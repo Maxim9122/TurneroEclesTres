@@ -37,6 +37,13 @@
                     <td>{{ $servicio->pivot->duracion_al_momento }} min</td>
                     <td>${{ number_format($servicio->pivot->precio_al_momento, 2, ',', '.') }}</td>
                 </tr>
+                @foreach ($turno->adicionales->where('servicio_id', $servicio->id) as $adicional)
+                    <tr>
+                        <td style="padding-left: 18px;">+ {{ $adicional->nombre_al_momento }}</td>
+                        <td>{{ $adicional->duracion_al_momento > 0 ? '+' . $adicional->duracion_al_momento . ' min' : '—' }}</td>
+                        <td>${{ number_format($adicional->precio_al_momento, 2, ',', '.') }}</td>
+                    </tr>
+                @endforeach
             @endforeach
         </tbody>
     </table>

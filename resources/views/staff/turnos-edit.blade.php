@@ -33,22 +33,12 @@
 
         <div>
             <label class="block text-sm mb-2">Servicios</label>
-            <div class="space-y-2">
-                @foreach ($servicios as $servicio)
-                    <label class="flex items-center justify-between bg-white border border-mate-borde rounded-md px-3 py-2 text-sm">
-                        <span class="flex items-center gap-2">
-                            <input type="checkbox" name="servicios[]" value="{{ $servicio->id }}"
-                                class="rounded border-mate-borde"
-                                @checked(in_array($servicio->id, old('servicios', $serviciosSeleccionados)))>
-                            {{ $servicio->nombre }}
-                            <span class="text-xs text-mate-tinta/50">({{ $servicio->duracion_minutos }} min)</span>
-                        </span>
-                        <span>${{ number_format($servicio->precio, 2, ',', '.') }}</span>
-                    </label>
-                @endforeach
-            </div>
+            <x-servicios-selector :servicios="$servicios"
+                :seleccionados="old('servicios', $serviciosSeleccionados)"
+                :adicionales-seleccionados="old('adicionales', $adicionalesSeleccionados)" />
             <p class="text-xs text-mate-tinta/50 mt-2">
-                El horario de fin se recalcula automáticamente según los servicios que dejes marcados.
+                El horario de fin se recalcula automáticamente según los servicios y adicionales que dejes marcados.
+                Lo que ya tenía el turno mantiene el precio con el que se reservó.
             </p>
         </div>
 

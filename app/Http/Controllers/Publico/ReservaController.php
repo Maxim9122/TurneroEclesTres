@@ -9,6 +9,7 @@ use App\Models\Servicio;
 use App\Models\Turno;
 use App\Services\DisponibilidadService;
 use App\Services\PushService;
+use App\Services\SeleccionServicios;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -34,14 +35,13 @@ class ReservaController extends Controller
             return redirect()->guest(route('cliente.login'));
         }
 
-        $servicioIds = (array) $request->query('servicios', []);
+        $seleccion = SeleccionServicios::desde(
+            $empresa->id,
+            (array) $request->query('servicios', []),
+            (array) $request->query('adicionales', []),
+        );
 
-        $servicios = Servicio::where('empresa_id', $empresa->id)
-            ->where('activo', true)
-            ->whereIn('id', $servicioIds)
-            ->get();
-
-        if ($servicios->isEmpty()) {
+        if ($seleccion->vacia()) {
             return redirect()->route('publico.empresa', $empresa)
                 ->with('status', 'Elegí al menos un servicio para reservar.');
         }
@@ -51,7 +51,7 @@ class ReservaController extends Controller
             ? Profesional::where('empresa_id', $empresa->id)->where('activo', true)->find($profesionalId)
             : null;
 
-        return view('publico.reserva-fecha', compact('empresa', 'servicios', 'profesional'));
+        return view('publico.reserva-fecha', compact('empresa', 'seleccion', 'profesional'));
     }
 
     public function horariosDisponibles(Request $request, Empresa $empresa): JsonResponse
@@ -60,19 +60,19 @@ class ReservaController extends Controller
             'fecha' => ['required', 'date', 'after_or_equal:today'],
             'servicios' => ['required', 'array', 'min:1'],
             'servicios.*' => ['integer'],
+            'adicionales' => ['nullable', 'array'],
+            'adicionales.*' => ['integer'],
             'profesional' => ['nullable', 'integer'],
         ]);
 
-        $servicios = Servicio::where('empresa_id', $empresa->id)
-            ->where('activo', true)
-            ->whereIn('id', $data['servicios'])
-            ->get();
+        $seleccion = SeleccionServicios::desde($empresa->id, $data['servicios'], $data['adicionales'] ?? []);
 
         $slots = $this->disponibilidad->slotsDisponibles(
             $empresa,
             Carbon::parse($data['fecha']),
-            $servicios,
-            $data['profesional'] ?? null
+            $seleccion->servicios,
+            $data['profesional'] ?? null,
+            $seleccion->minutosAdicionales(),
         );
 
         return response()->json(['slots' => $slots]);
@@ -89,15 +89,14 @@ class ReservaController extends Controller
             'hora' => ['required', 'date_format:H:i'],
             'servicios' => ['required', 'array', 'min:1'],
             'servicios.*' => ['integer'],
+            'adicionales' => ['nullable', 'array'],
+            'adicionales.*' => ['integer'],
             'profesional' => ['nullable', 'integer'],
         ]);
 
-        $servicios = Servicio::where('empresa_id', $empresa->id)
-            ->where('activo', true)
-            ->whereIn('id', $data['servicios'])
-            ->get();
+        $seleccion = SeleccionServicios::desde($empresa->id, $data['servicios'], $data['adicionales'] ?? []);
 
-        if ($servicios->isEmpty()) {
+        if ($seleccion->vacia()) {
             return back()->withErrors(['servicios' => 'Los servicios elegidos ya no están disponibles.']);
         }
 
@@ -105,16 +104,17 @@ class ReservaController extends Controller
 
         // Revalidamos disponibilidad al confirmar, por si alguien más
         // reservó ese horario mientras el cliente completaba el formulario.
-        $slotsVigentes = $this->disponibilidad->slotsDisponibles($empresa, $fecha, $servicios, $data['profesional'] ?? null);
+        $slotsVigentes = $this->disponibilidad->slotsDisponibles(
+            $empresa, $fecha, $seleccion->servicios, $data['profesional'] ?? null, $seleccion->minutosAdicionales()
+        );
 
         if (!in_array($data['hora'], $slotsVigentes, true)) {
             return back()->withErrors(['hora' => 'Ese horario ya no está disponible. Elegí otro, por favor.']);
         }
 
-        $duracionTotal = (int) $servicios->sum('duracion_minutos');
-        $horaFin = Carbon::parse($data['hora'])->addMinutes($duracionTotal)->format('H:i');
+        $horaFin = Carbon::parse($data['hora'])->addMinutes($seleccion->duracionMinutos())->format('H:i');
 
-        $turno = DB::transaction(function () use ($empresa, $data, $fecha, $horaFin, $servicios) {
+        $turno = DB::transaction(function () use ($empresa, $data, $fecha, $horaFin, $seleccion) {
             $turno = Turno::create([
                 'empresa_id' => $empresa->id,
                 'cliente_id' => Auth::guard('cliente')->id(),
@@ -126,12 +126,7 @@ class ReservaController extends Controller
                 'estado' => 'confirmado',
             ]);
 
-            foreach ($servicios as $servicio) {
-                $turno->servicios()->attach($servicio->id, [
-                    'precio_al_momento' => $servicio->precio,
-                    'duracion_al_momento' => $servicio->duracion_minutos,
-                ]);
-            }
+            $seleccion->guardarEn($turno);
 
             return $turno;
         });
@@ -147,7 +142,7 @@ class ReservaController extends Controller
     {
         abort_if($turno->cliente_id !== Auth::guard('cliente')->id(), 403);
 
-        $turno->load(['empresa', 'profesional', 'servicios']);
+        $turno->load(['empresa', 'profesional', 'servicios', 'adicionales']);
 
         return view('publico.reserva-confirmada', compact('turno'));
     }

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Cliente;
 use App\Models\Servicio;
 use App\Models\Turno;
+use App\Services\SeleccionServicios;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -22,7 +23,7 @@ class TurnoRapidoController extends Controller
     {
         $empresa = Auth::guard('web')->user()->empresa;
 
-        $servicios = $empresa->servicios()->where('activo', true)->orderBy('nombre')->get();
+        $servicios = $empresa->servicios()->where('activo', true)->with('adicionalesActivos')->orderBy('nombre')->get();
         $profesionales = $empresa->profesionales()->where('activo', true)->orderBy('nombre')->get();
 
         return view('staff.turno-rapido', compact('servicios', 'profesionales'));
@@ -38,19 +39,25 @@ class TurnoRapidoController extends Controller
             'cliente_telefono_nuevo' => ['nullable', 'string', 'max:30'],
             'servicios' => ['required', 'array', 'min:1'],
             'servicios.*' => ['integer', 'exists:servicios,id'],
+            'adicionales' => ['nullable', 'array'],
+            'adicionales.*' => ['integer'],
             'profesional' => ['nullable', 'exists:profesionales,id'],
             'fecha_listado' => ['nullable', 'date'],
         ]);
 
-        $servicios = Servicio::where('empresa_id', $empresa->id)
-            ->where('activo', true)
-            ->whereIn('id', $data['servicios'])
-            ->get();
+        $seleccion = SeleccionServicios::desde($empresa->id, $data['servicios'], $data['adicionales'] ?? []);
+
+        if ($seleccion->vacia()) {
+            $mensaje = 'Elegí al menos un servicio.';
+            return $request->wantsJson()
+                ? response()->json(['error' => $mensaje], 422)
+                : back()->withErrors(['servicios' => $mensaje])->withInput();
+        }
 
         try {
-            $turno = DB::transaction(function () use ($empresa, $data, $servicios) {
+            $turno = DB::transaction(function () use ($empresa, $data, $seleccion) {
                 $ahora = Carbon::now();
-                $duracionTotal = (int) $servicios->sum('duracion_minutos');
+                $duracionTotal = $seleccion->duracionMinutos();
                 $horaInicio = $ahora->format('H:i');
                 $horaFin = $ahora->copy()->addMinutes($duracionTotal)->format('H:i');
 
@@ -87,12 +94,7 @@ class TurnoRapidoController extends Controller
                     'estado' => 'confirmado',
                 ]);
 
-                foreach ($servicios as $servicio) {
-                    $turno->servicios()->attach($servicio->id, [
-                        'precio_al_momento' => $servicio->precio,
-                        'duracion_al_momento' => $servicio->duracion_minutos,
-                    ]);
-                }
+                $seleccion->guardarEn($turno);
 
                 return $turno;
             });

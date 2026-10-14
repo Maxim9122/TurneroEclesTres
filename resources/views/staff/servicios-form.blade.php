@@ -83,6 +83,58 @@
     @endisset
 </div>
 
+{{-- Adicionales del servicio (ej: diseño, líneas) --}}
+@php
+    $adicionalesIniciales = old('adicionales', isset($servicio)
+        ? $servicio->adicionales->map(fn ($a) => [
+            'id' => $a->id, 'nombre' => $a->nombre, 'precio' => (float) $a->precio, 'duracion_minutos' => $a->duracion_minutos,
+        ])->values()->all()
+        : []);
+    $ejemploAdicional = match (\Illuminate\Support\Facades\Auth::guard('web')->user()->empresa->rubro) {
+        'peluqueria', 'barberia' => 'Ej: Diseño, Líneas, Lavado...',
+        'estetica', 'unas' => 'Ej: Decoración, Esmaltado semipermanente...',
+        default => 'Ej: Extra que el cliente puede sumar',
+    };
+@endphp
+<div x-data="{
+        adicionales: @js(array_values($adicionalesIniciales)),
+        agregar() { this.adicionales.push({ id: null, nombre: '', precio: '', duracion_minutos: 0 }); },
+        quitar(i) { this.adicionales.splice(i, 1); },
+    }" class="border-t border-mate-borde pt-4">
+    <div class="flex items-center justify-between mb-1">
+        <label class="block text-sm">Adicionales (opcional)</label>
+        <button type="button" @click="agregar()" class="text-sm text-mate-salvia font-medium">+ Agregar adicional</button>
+    </div>
+    <p class="text-xs text-mate-tinta/50 mb-2">
+        Extras que el cliente puede sumar a este servicio al reservar, con su precio y minutos extra (si suma tiempo).
+    </p>
+
+    <template x-for="(adicional, i) in adicionales" :key="i">
+        <div class="grid grid-cols-12 gap-2 items-end mb-2 bg-white border border-mate-borde rounded-md p-2">
+            <input type="hidden" :name="`adicionales[${i}][id]`" :value="adicional.id ?? ''">
+            <div class="col-span-12 sm:col-span-5">
+                <label class="block text-xs text-mate-tinta/60 mb-0.5">Nombre</label>
+                <input type="text" :name="`adicionales[${i}][nombre]`" x-model="adicional.nombre" required maxlength="100"
+                    placeholder="{{ $ejemploAdicional }}"
+                    class="w-full rounded-md border border-mate-borde bg-white px-2 py-1.5 text-sm">
+            </div>
+            <div class="col-span-5 sm:col-span-3">
+                <label class="block text-xs text-mate-tinta/60 mb-0.5">Precio</label>
+                <input type="number" :name="`adicionales[${i}][precio]`" x-model="adicional.precio" required min="0" step="0.01"
+                    class="w-full rounded-md border border-mate-borde bg-white px-2 py-1.5 text-sm">
+            </div>
+            <div class="col-span-5 sm:col-span-3">
+                <label class="block text-xs text-mate-tinta/60 mb-0.5">Minutos extra</label>
+                <input type="number" :name="`adicionales[${i}][duracion_minutos]`" x-model="adicional.duracion_minutos" min="0" max="240" step="5"
+                    class="w-full rounded-md border border-mate-borde bg-white px-2 py-1.5 text-sm">
+            </div>
+            <div class="col-span-2 sm:col-span-1 text-right">
+                <button type="button" @click="quitar(i)" class="text-red-700 text-lg leading-none px-1" aria-label="Quitar adicional">&times;</button>
+            </div>
+        </div>
+    </template>
+</div>
+
 @php
     $rubroActual = \Illuminate\Support\Facades\Auth::guard('web')->user()->empresa->rubro;
     $ejemploCombo = match ($rubroActual) {

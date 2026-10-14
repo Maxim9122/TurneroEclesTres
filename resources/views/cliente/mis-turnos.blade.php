@@ -21,7 +21,7 @@
                             {{ $turno->fecha->format('d/m/Y') }} · {{ substr($turno->hora_inicio, 0, 5) }}hs
                         </p>
                         <p class="text-xs text-mate-tinta/60">
-                            {{ $turno->servicios->pluck('nombre')->implode(' + ') }}
+                            {{ $turno->descripcionServicios() }}
                             · ${{ number_format($turno->precioTotal(), 2, ',', '.') }}
                         </p>
                         <p class="text-xs text-mate-tinta/60">
@@ -71,7 +71,7 @@
                             {{ $turno->fecha->format('d/m/Y') }} · {{ substr($turno->hora_inicio, 0, 5) }}hs
                         </p>
                         <p class="text-xs text-mate-tinta/60">
-                            {{ $turno->servicios->pluck('nombre')->implode(' + ') }}
+                            {{ $turno->descripcionServicios() }}
                         </p>
                     </div>
 

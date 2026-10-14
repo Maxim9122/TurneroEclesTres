@@ -31,8 +31,11 @@
             this.error = '';
             const params = new URLSearchParams();
             params.append('fecha', this.fecha);
-            @foreach ($servicios as $servicio)
+            @foreach ($seleccion->servicios as $servicio)
                 params.append('servicios[]', '{{ $servicio->id }}');
+            @endforeach
+            @foreach ($seleccion->adicionales as $adicional)
+                params.append('adicionales[]', '{{ $adicional->id }}');
             @endforeach
             @if ($profesional)
                 params.append('profesional', '{{ $profesional->id }}');
@@ -46,15 +49,27 @@
     }">
 
     <h1 class="font-display text-xl mb-1">Elegí día y horario</h1>
-    <p class="text-sm text-mate-tinta/70 mb-6">
-        {{ $servicios->pluck('nombre')->implode(' + ') }}
-        ({{ $servicios->sum('duracion_minutos') }} min · ${{ number_format($servicios->sum('precio'), 2, ',', '.') }})
+    <div class="text-sm text-mate-tinta/70 mb-6">
+        @foreach ($seleccion->servicios as $servicio)
+            <p>
+                {{ $servicio->nombre }}
+                @php($extras = $seleccion->adicionales->where('servicio_id', $servicio->id))
+                @if ($extras->isNotEmpty())
+                    <span class="text-mate-tinta/60">+ {{ $extras->pluck('nombre')->implode(', ') }}</span>
+                @endif
+            </p>
+        @endforeach
+        <p class="font-medium text-mate-tinta mt-1">
+            {{ $seleccion->duracionMinutos() }} min · ${{ number_format($seleccion->precio(), 2, ',', '.') }}
+        </p>
+        <p class="mt-1">
         @if ($profesional)
-            <br>Con {{ $profesional->nombre }}
+            Con {{ $profesional->nombre }}
         @else
-            <br>Sin preferencia de profesional
+            Sin preferencia de profesional
         @endif
-    </p>
+        </p>
+    </div>
 
     <div class="mb-6">
         <label class="block text-sm mb-1">Fecha</label>
@@ -88,8 +103,11 @@
         @csrf
         <input type="hidden" name="fecha" x-bind:value="fecha">
         <input type="hidden" name="hora" x-bind:value="hora">
-        @foreach ($servicios as $servicio)
+        @foreach ($seleccion->servicios as $servicio)
             <input type="hidden" name="servicios[]" value="{{ $servicio->id }}">
+        @endforeach
+        @foreach ($seleccion->adicionales as $adicional)
+            <input type="hidden" name="adicionales[]" value="{{ $adicional->id }}">
         @endforeach
         @if ($profesional)
             <input type="hidden" name="profesional" value="{{ $profesional->id }}">

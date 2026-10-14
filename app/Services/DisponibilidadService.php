@@ -12,9 +12,12 @@ class DisponibilidadService
 {
     private const INTERVALO_MINUTOS = 30;
 
-    public function slotsDisponibles(Empresa $empresa, Carbon $fecha, Collection $servicios, ?int $profesionalId = null): array
+    /**
+     * @param  int  $minutosExtra  minutos que suman los adicionales elegidos (diseño, líneas, etc.)
+     */
+    public function slotsDisponibles(Empresa $empresa, Carbon $fecha, Collection $servicios, ?int $profesionalId = null, int $minutosExtra = 0): array
     {
-        $duracionTotal = (int) $servicios->sum('duracion_minutos');
+        $duracionTotal = (int) $servicios->sum('duracion_minutos') + max(0, $minutosExtra);
 
         if ($duracionTotal <= 0) {
             return [];

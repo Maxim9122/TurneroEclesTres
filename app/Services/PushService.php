@@ -27,11 +27,11 @@ class PushService
 
     public function nuevoTurno(Turno $turno): void
     {
-        $turno->loadMissing(['cliente', 'servicios']);
+        $turno->loadMissing(['cliente', 'servicios', 'adicionales']);
 
         $cuerpo = collect([
             $turno->cliente?->nombre,
-            $turno->servicios->pluck('nombre')->join(', '),
+            $turno->descripcionServicios(),
             $turno->fecha->format('d/m') . ' ' . substr((string) $turno->hora_inicio, 0, 5) . ' hs',
         ])->filter()->join(' · ');
 

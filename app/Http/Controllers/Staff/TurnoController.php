@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Staff;
 
 use App\Http\Controllers\Controller;
 use App\Models\Servicio;
+use App\Services\SeleccionServicios;
 use App\Models\Turno;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
@@ -23,7 +24,7 @@ class TurnoController extends Controller
         $destacar = $request->query('destacar');
 
         $turnos = $empresa->turnos()
-            ->with(['cliente', 'profesional', 'servicios'])
+            ->with(['cliente', 'profesional', 'servicios', 'adicionales'])
             ->whereDate('fecha', $fecha)
             ->orderBy('hora_inicio')
             ->get();
@@ -83,10 +84,11 @@ class TurnoController extends Controller
 
         $empresa = $turno->empresa;
         $profesionales = $empresa->profesionales()->where('activo', true)->orderBy('nombre')->get();
-        $servicios = $empresa->servicios()->where('activo', true)->orderBy('nombre')->get();
+        $servicios = $empresa->servicios()->where('activo', true)->with('adicionalesActivos')->orderBy('nombre')->get();
         $serviciosSeleccionados = $turno->servicios->pluck('id')->all();
+        $adicionalesSeleccionados = $turno->adicionales->pluck('servicio_adicional_id')->filter()->all();
 
-        return view('staff.turnos-edit', compact('turno', 'profesionales', 'servicios', 'serviciosSeleccionados'));
+        return view('staff.turnos-edit', compact('turno', 'profesionales', 'servicios', 'serviciosSeleccionados', 'adicionalesSeleccionados'));
     }
 
     public function update(Request $request, Turno $turno): RedirectResponse
@@ -99,27 +101,20 @@ class TurnoController extends Controller
             'profesional_id' => ['nullable', 'exists:profesionales,id'],
             'servicios' => ['required', 'array', 'min:1'],
             'servicios.*' => ['integer', 'exists:servicios,id'],
+            'adicionales' => ['nullable', 'array'],
+            'adicionales.*' => ['integer'],
         ]);
 
+        $seleccion = SeleccionServicios::desde($turno->empresa_id, $data['servicios'], $data['adicionales'] ?? [], soloActivos: false);
+
+        if ($seleccion->vacia()) {
+            return back()->withErrors(['servicios' => 'Elegí al menos un servicio.'])->withInput();
+        }
+
         try {
-            DB::transaction(function () use ($turno, $data) {
-                $idsActuales = $turno->servicios->pluck('id')->all();
-                $idsNuevos = $data['servicios'];
-
-                $paraQuitar = array_diff($idsActuales, $idsNuevos);
-                $paraAgregar = array_diff($idsNuevos, $idsActuales);
-
-                if ($paraQuitar) {
-                    $turno->servicios()->detach($paraQuitar);
-                }
-
-                foreach ($paraAgregar as $servicioId) {
-                    $servicio = Servicio::find($servicioId);
-                    $turno->servicios()->attach($servicioId, [
-                        'precio_al_momento' => $servicio->precio,
-                        'duracion_al_momento' => $servicio->duracion_minutos,
-                    ]);
-                }
+            DB::transaction(function () use ($turno, $data, $seleccion) {
+                // Lo que ya tenía el turno conserva su precio; solo lo nuevo toma el precio actual.
+                $seleccion->sincronizar($turno);
 
                 $turno->refresh();
 

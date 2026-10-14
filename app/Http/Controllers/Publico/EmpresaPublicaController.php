@@ -20,7 +20,7 @@ class EmpresaPublicaController extends Controller
             abort(404);
         }
 
-        $servicios = $empresa->servicios()->where('activo', true)->orderBy('nombre')->get();
+        $servicios = $empresa->servicios()->where('activo', true)->with('adicionalesActivos')->orderBy('nombre')->get();
         $profesionales = $empresa->profesionales()->where('activo', true)->orderBy('nombre')->get();
 
         $categoriaId = $request->query('categoria');

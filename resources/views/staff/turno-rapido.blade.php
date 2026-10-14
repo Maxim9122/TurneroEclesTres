@@ -104,19 +104,7 @@
 
         <div>
             <p class="text-sm font-medium mb-2">Servicios</p>
-            <div class="space-y-2">
-                @foreach ($servicios as $servicio)
-                    <label class="flex items-center justify-between bg-white border border-mate-borde rounded-md px-3 py-2 text-sm cursor-pointer">
-                        <span class="flex items-center gap-2">
-                            <input type="checkbox" name="servicios[]" value="{{ $servicio->id }}"
-                                @change="toggleServicio({{ $servicio->id }})" class="rounded border-mate-borde">
-                            {{ $servicio->nombre }}
-                            <span class="text-xs text-mate-tinta/50">({{ $servicio->duracion_minutos }} min)</span>
-                        </span>
-                        <span>${{ number_format($servicio->precio, 2, ',', '.') }}</span>
-                    </label>
-                @endforeach
-            </div>
+            <x-servicios-selector :servicios="$servicios" :seleccionados="old('servicios', [])" :adicionales-seleccionados="old('adicionales', [])" />
         </div>
 
         <div>

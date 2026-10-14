@@ -56,11 +56,23 @@
 
     <main class="max-w-md mx-auto px-4 py-6" x-data="{
         servicioIds: [],
+        adicionalIds: [],
+        adicionalesDe: @js($servicios->mapWithKeys(fn ($s) => [$s->id => $s->adicionalesActivos->pluck('id')])),
         profesionalId: '',
         toggleServicio(id) {
-            this.servicioIds.includes(id)
-                ? this.servicioIds = this.servicioIds.filter(s => s !== id)
-                : this.servicioIds.push(id);
+            if (this.servicioIds.includes(id)) {
+                this.servicioIds = this.servicioIds.filter(s => s !== id);
+                // al desmarcar el servicio se desmarcan sus adicionales
+                const suyos = this.adicionalesDe[id] || [];
+                this.adicionalIds = this.adicionalIds.filter(a => !suyos.includes(a));
+            } else {
+                this.servicioIds.push(id);
+            }
+        },
+        toggleAdicional(id) {
+            this.adicionalIds.includes(id)
+                ? this.adicionalIds = this.adicionalIds.filter(a => a !== id)
+                : this.adicionalIds.push(id);
         }
     }">
         @if ($empresa->descripcion)
@@ -97,6 +109,28 @@
                             </span>
                             <span class="text-sm font-medium">${{ number_format($servicio->precio, 2, ',', '.') }}</span>
                         </label>
+
+                        @if ($servicio->adicionalesActivos->isNotEmpty())
+                            {{-- Adicionales: aparecen al elegir el servicio --}}
+                            <div x-show="servicioIds.includes({{ $servicio->id }})" x-cloak style="display: none;"
+                                class="ml-6 -mt-1 mb-1 space-y-1 border-l-2 border-mate-borde pl-3">
+                                <p class="text-xs text-mate-tinta/60 pt-1">Adicionales (opcional)</p>
+                                @foreach ($servicio->adicionalesActivos as $adicional)
+                                    <label class="flex items-center justify-between gap-2 text-sm cursor-pointer py-1">
+                                        <span class="flex items-center gap-2">
+                                            <input type="checkbox" class="rounded border-mate-borde"
+                                                :checked="adicionalIds.includes({{ $adicional->id }})"
+                                                @change="toggleAdicional({{ $adicional->id }})">
+                                            {{ $adicional->nombre }}
+                                            @if ($adicional->duracion_minutos > 0)
+                                                <span class="text-xs text-mate-tinta/50">(+{{ $adicional->duracion_minutos }} min)</span>
+                                            @endif
+                                        </span>
+                                        <span class="text-sm text-mate-tinta/80">+${{ number_format($adicional->precio, 2, ',', '.') }}</span>
+                                    </label>
+                                @endforeach
+                            </div>
+                        @endif
                     @endforeach
                 </div>
             @endif
@@ -213,6 +247,7 @@
             @click="
                 const params = new URLSearchParams();
                 servicioIds.forEach(id => params.append('servicios[]', id));
+                adicionalIds.forEach(id => params.append('adicionales[]', id));
                 if (profesionalId) params.append('profesional', profesionalId);
                 window.location.href = '{{ route('publico.reserva.iniciar', $empresa) }}?' + params.toString();
             "

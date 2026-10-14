@@ -140,7 +140,7 @@
                             · {{ $turno->cliente->nombre }}
                         </p>
                         <p class="text-xs text-mate-tinta/60 mt-0.5">
-                            {{ $turno->servicios->pluck('nombre')->implode(' + ') }}
+                            {{ $turno->descripcionServicios() }}
                             · ${{ number_format($turno->precioTotal(), 2, ',', '.') }}
                         </p>
                         <p class="text-xs text-mate-tinta/60">
@@ -164,7 +164,7 @@
                     @php
                         $mensajeTurno = "Hola {$turno->cliente->nombre}! Te confirmamos tu turno en {$turno->empresa->nombre} (EclesTres) "
                             . "para el {$turno->fecha->format('d/m/Y')} a las " . substr($turno->hora_inicio, 0, 5) . "hs. "
-                            . "Servicios: " . $turno->servicios->pluck('nombre')->implode(' + ') . ". ¡Te esperamos!";
+                            . "Servicios: " . $turno->descripcionServicios() . ". ¡Te esperamos!";
                         $linkWhatsapp = \App\Support\WhatsApp::linkChat($turno->cliente->telefono, $mensajeTurno);
                     @endphp
 
@@ -324,18 +324,10 @@
 
                     <div>
                         <p class="text-sm font-medium mb-2">Servicios</p>
-                        <div class="space-y-2 max-h-40 overflow-y-auto">
-                            @foreach (Auth::guard('web')->user()->empresa->servicios()->where('activo', true)->orderBy('nombre')->get() as $servicio)
-                                <label class="flex items-center justify-between bg-white border border-mate-borde rounded-md px-3 py-2 text-sm cursor-pointer">
-                                    <span class="flex items-center gap-2">
-                                        <input type="checkbox" name="servicios[]" value="{{ $servicio->id }}"
-                                            @change="rapido.toggleServicio({{ $servicio->id }})" class="rounded border-mate-borde">
-                                        {{ $servicio->nombre }}
-                                    </span>
-                                    <span>${{ number_format($servicio->precio, 2, ',', '.') }}</span>
-                                </label>
-                            @endforeach
-                        </div>
+                        <x-servicios-selector
+                            :servicios="Auth::guard('web')->user()->empresa->servicios()->where('activo', true)->with('adicionalesActivos')->orderBy('nombre')->get()"
+                            :mostrar-duracion="false"
+                            class="space-y-2 max-h-56 overflow-y-auto" />
                     </div>
 
                     <div>

@@ -17,7 +17,7 @@ class MisTurnosController extends Controller
         $desde = $request->query('desde');
         $hasta = $request->query('hasta');
 
-        $proximos = Turno::with(['empresa', 'profesional', 'servicios'])
+        $proximos = Turno::with(['empresa', 'profesional', 'servicios', 'adicionales'])
             ->where('cliente_id', $clienteId)
             ->whereIn('estado', ['pendiente', 'confirmado'])
             ->where(function ($q) {
@@ -31,7 +31,7 @@ class MisTurnosController extends Controller
             ->orderBy('hora_inicio')
             ->get();
 
-        $historial = Turno::with(['empresa', 'profesional', 'servicios'])
+        $historial = Turno::with(['empresa', 'profesional', 'servicios', 'adicionales'])
             ->where('cliente_id', $clienteId)
             ->where(function ($q) {
                 $q->whereIn('estado', ['completado', 'cancelado', 'no_show'])

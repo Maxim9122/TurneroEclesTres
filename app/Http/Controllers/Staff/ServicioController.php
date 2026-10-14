@@ -17,7 +17,7 @@ class ServicioController extends Controller
     {
         $empresa = Auth::guard('web')->user()->empresa;
 
-        $servicios = $empresa->servicios()->with('imagenes')->orderBy('nombre')->get();
+        $servicios = $empresa->servicios()->with(['imagenes', 'adicionales'])->orderBy('nombre')->get();
 
         return view('staff.servicios-index', compact('servicios'));
     }
@@ -35,6 +35,8 @@ class ServicioController extends Controller
 
         $servicio = $empresa->servicios()->create($data);
 
+        $this->guardarAdicionales($servicio, $request->input('adicionales', []));
+
         if ($request->hasFile('foto')) {
             $this->guardarFotoPrincipal($servicio, $request);
         }
@@ -49,7 +51,7 @@ class ServicioController extends Controller
     {
         $this->autorizar($servicio);
 
-        $servicio->load('imagenes');
+        $servicio->load(['imagenes', 'adicionales']);
 
         return view('staff.servicios-edit', compact('servicio'));
     }
@@ -61,6 +63,8 @@ class ServicioController extends Controller
         $data = $this->validarDatos($request);
 
         $servicio->update($data);
+
+        $this->guardarAdicionales($servicio, $request->input('adicionales', []));
 
         if ($request->hasFile('foto')) {
             $this->guardarFotoPrincipal($servicio, $request);
@@ -102,7 +106,46 @@ class ServicioController extends Controller
             'precio' => ['required', 'numeric', 'min:0'],
             'foto' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
             'imagenes_adicionales.*' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'adicionales' => ['nullable', 'array', 'max:20'],
+            'adicionales.*.id' => ['nullable', 'integer'],
+            'adicionales.*.nombre' => ['required', 'string', 'max:100'],
+            'adicionales.*.precio' => ['required', 'numeric', 'min:0'],
+            'adicionales.*.duracion_minutos' => ['nullable', 'integer', 'min:0', 'max:240'],
+        ], [], [
+            'adicionales.*.nombre' => 'nombre del adicional',
+            'adicionales.*.precio' => 'precio del adicional',
+            'adicionales.*.duracion_minutos' => 'minutos extra del adicional',
         ]);
+    }
+
+    /**
+     * Sincroniza la lista de adicionales del formulario: actualiza los existentes, crea los nuevos y
+     * borra los que se quitaron. Los turnos ya reservados guardan su propia copia, así que no cambian.
+     */
+    private function guardarAdicionales(Servicio $servicio, array $filas): void
+    {
+        $conservar = [];
+
+        foreach ($filas as $fila) {
+            $datos = [
+                'nombre' => trim($fila['nombre']),
+                'precio' => $fila['precio'],
+                'duracion_minutos' => (int) ($fila['duracion_minutos'] ?? 0),
+                'activo' => true,
+            ];
+
+            // Solo se actualiza un adicional que sea de ESTE servicio; un id ajeno se trata como nuevo.
+            $existente = !empty($fila['id']) ? $servicio->adicionales()->find($fila['id']) : null;
+
+            if ($existente) {
+                $existente->update($datos);
+                $conservar[] = $existente->id;
+            } else {
+                $conservar[] = $servicio->adicionales()->create($datos)->id;
+            }
+        }
+
+        $servicio->adicionales()->whereNotIn('id', $conservar)->delete();
     }
 
     private function guardarFotoPrincipal(Servicio $servicio, Request $request): void

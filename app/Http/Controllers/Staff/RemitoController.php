@@ -64,7 +64,7 @@ class RemitoController extends Controller
 
     public function verTurno(Turno $turno)
     {
-        $turno->load(['empresa', 'cliente', 'profesional', 'servicios']);
+        $turno->load(['empresa', 'cliente', 'profesional', 'servicios', 'adicionales']);
 
         $pdf = Pdf::loadView('pdf.remito-turno', compact('turno'));
 
