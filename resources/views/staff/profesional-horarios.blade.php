@@ -6,7 +6,9 @@
                 Este profesional todavía no tiene un horario propio cargado, así que está usando el
                 <a href="{{ auth('web')->user()->esAdmin() ? route('staff.empresa.horario-general.edit') : '#' }}" class="underline">
                     horario general del negocio
-                </a>.
+                </a>@if ($profesional->empresa->usaHorarioPorDefecto())
+                    (como el negocio tampoco cargó uno, rige el horario por defecto: todos los días de
+                    {{ \App\Models\Empresa::HORARIO_DEFECTO_INICIO }} a {{ \App\Models\Empresa::horaParaMostrar(\App\Models\Empresa::HORARIO_DEFECTO_FIN) }})@endif.
                 Si cargás un horario acá abajo, este profesional pasa a usar SU PROPIO horario en vez del general.
             </div>
         @endif

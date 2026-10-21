@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use App\Models\Direccion;
 
@@ -66,6 +67,42 @@ class Empresa extends Model
     public function horarios(): HasMany
     {
         return $this->hasMany(EmpresaHorario::class);
+    }
+
+    /**
+     * Horario por defecto mientras el negocio no cargue el suyo: todos los días de 07:00 a 00:00.
+     * El cierre se guarda como 23:59 para que ningún turno termine "a las 00:00" del día siguiente.
+     */
+    public const HORARIO_DEFECTO_INICIO = '07:00';
+    public const HORARIO_DEFECTO_FIN = '23:59';
+
+    /** El horario que realmente rige: el cargado por el negocio o, si no cargó ninguno, el por defecto. */
+    public function horariosEfectivos(): Collection
+    {
+        return $this->usaHorarioPorDefecto() ? self::horarioPorDefecto($this->id) : $this->horarios;
+    }
+
+    public function usaHorarioPorDefecto(): bool
+    {
+        return $this->horarios->isEmpty();
+    }
+
+    public static function horarioPorDefecto(?int $empresaId = null): Collection
+    {
+        return collect(range(0, 6))->map(fn ($dia) => new EmpresaHorario([
+            'empresa_id' => $empresaId,
+            'dia_semana' => $dia,
+            'hora_inicio' => self::HORARIO_DEFECTO_INICIO,
+            'hora_fin' => self::HORARIO_DEFECTO_FIN,
+        ]));
+    }
+
+    /** "07:00" / "00:00" para mostrar (23:59 se muestra como medianoche). */
+    public static function horaParaMostrar(string $hora): string
+    {
+        $hora = substr($hora, 0, 5);
+
+        return $hora === '23:59' ? '00:00' : $hora;
     }
 
     public function direcciones(): MorphMany

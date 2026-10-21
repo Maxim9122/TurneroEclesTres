@@ -4,9 +4,19 @@
         <a href="{{ route('staff.empresa.dashboard') }}" class="text-sm text-mate-salvia">Volver</a>
     </div>
 
-    <p class="text-sm text-mate-tinta/70 mb-6">
+    <p class="text-sm text-mate-tinta/70 mb-4">
         Este horario se usa automáticamente para cualquier profesional que no tenga cargado un horario propio.
+        Cargarlo es <strong>opcional</strong>.
     </p>
+
+    @if ($horarios->isEmpty())
+        <div class="mb-6 text-sm text-mate-tinta/80 bg-mate-borde/30 border border-mate-borde rounded-md p-3">
+            Todavía no cargaste un horario, así que se usa el <strong>horario por defecto: todos los días de
+            {{ \App\Models\Empresa::HORARIO_DEFECTO_INICIO }} a {{ \App\Models\Empresa::horaParaMostrar(\App\Models\Empresa::HORARIO_DEFECTO_FIN) }}</strong>.
+            Cuando agregues tu primer rango horario abajo, pasa a regir <strong>solo tu horario</strong>
+            (los días que dejes sin rangos quedan sin atención).
+        </div>
+    @endif
 
     @if (session('status'))
         <div class="mb-4 text-sm text-green-800 bg-green-50 border border-green-200 rounded-md p-3">
@@ -36,7 +46,14 @@
                         </form>
                     </div>
                 @empty
-                    <p class="text-xs text-mate-tinta/50">Sin atención este día.</p>
+                    @if ($horarios->isEmpty())
+                        <p class="text-sm text-mate-tinta/60">
+                            {{ \App\Models\Empresa::HORARIO_DEFECTO_INICIO }} — {{ \App\Models\Empresa::horaParaMostrar(\App\Models\Empresa::HORARIO_DEFECTO_FIN) }}
+                            <span class="text-xs">(por defecto)</span>
+                        </p>
+                    @else
+                        <p class="text-xs text-mate-tinta/50">Sin atención este día.</p>
+                    @endif
                 @endforelse
             </div>
         @endforeach

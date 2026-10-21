@@ -49,7 +49,8 @@ class Profesional extends Model
     {
         $propios = $this->horarios;
 
-        return $propios->isNotEmpty() ? $propios : $this->empresa->horarios;
+        // Sin horario propio: el del negocio (o el por defecto, si el negocio tampoco cargó uno).
+        return $propios->isNotEmpty() ? $propios : $this->empresa->horariosEfectivos();
     }
 
     public function usaHorarioGeneral(): bool
