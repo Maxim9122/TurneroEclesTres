@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Staff;
 
 use App\Http\Controllers\Controller;
+use App\Support\Imagenes;
 use App\Models\Profesional;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -94,16 +95,7 @@ class ProfesionalController extends Controller
 
     private function guardarFoto(Profesional $profesional, Request $request): void
     {
-        $carpeta = "profesionales/{$profesional->id}";
-
-        foreach (Storage::disk('public')->files($carpeta) as $existente) {
-            if (str_starts_with(basename($existente), 'foto.')) {
-                Storage::disk('public')->delete($existente);
-            }
-        }
-
-        $extension = $request->file('foto')->getClientOriginalExtension();
-        $profesional->foto_path = $request->file('foto')->storeAs($carpeta, "foto.{$extension}", 'public');
+        $profesional->foto_path = Imagenes::guardar($request->file('foto'), "profesionales/{$profesional->id}", 'foto', Imagenes::FOTO);
         $profesional->save();
     }
 

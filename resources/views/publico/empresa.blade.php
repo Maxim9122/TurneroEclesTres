@@ -6,8 +6,6 @@
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
     <x-pwa-head />
     <title>{{ $empresa->nombre }} - EclesTres</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         html { overflow-anchor: none; }
     </style>
@@ -98,7 +96,7 @@
                                     <span onclick="event.preventDefault()">
                                         <x-galeria-modal :imagenes="$servicio->todasLasImagenes()" :nombre="$servicio->nombre">
                                             <div class="w-8 h-8 rounded-md overflow-hidden shrink-0">
-                                                <img src="{{ asset('storage/' . $servicio->todasLasImagenes()[0]) }}" class="w-full h-full object-cover">
+                                                <img loading="lazy" decoding="async" src="{{ asset('storage/' . $servicio->todasLasImagenes()[0]) }}" class="w-full h-full object-cover">
                                             </div>
                                         </x-galeria-modal>
                                     </span>
@@ -166,7 +164,7 @@
                             <x-galeria-modal :imagenes="$producto->todasLasImagenes()" :nombre="$producto->nombre">
                                 <div class="w-12 h-12 rounded-md overflow-hidden">
                                     @if ($producto->foto_path)
-                                        <img src="{{ asset('storage/' . $producto->foto_path) }}" class="w-full h-full object-cover">
+                                        <img loading="lazy" decoding="async" src="{{ asset('storage/' . $producto->foto_path) }}" class="w-full h-full object-cover">
                                     @else
                                         <div class="w-full h-full bg-mate-borde"></div>
                                     @endif
@@ -230,7 +228,7 @@
                         class="flex flex-col items-center gap-1 p-2 rounded-md border"
                         :class="profesionalId === '{{ $profesional->id }}' ? 'border-mate-salvia bg-mate-superficie' : 'border-mate-borde'">
                         @if ($profesional->foto_path)
-                            <img src="{{ asset('storage/' . $profesional->foto_path) }}" class="w-12 h-12 rounded-full object-cover">
+                            <img loading="lazy" decoding="async" src="{{ asset('storage/' . $profesional->foto_path) }}" class="w-12 h-12 rounded-full object-cover">
                         @else
                             <div class="w-12 h-12 rounded-full bg-mate-borde"></div>
                         @endif

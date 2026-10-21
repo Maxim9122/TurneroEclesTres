@@ -6,8 +6,6 @@
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
     <x-pwa-head />
     <title>Turno confirmado - {{ $turno->empresa->nombre }}</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css'])
 </head>
 <body class="min-h-screen bg-mate-fondo font-body flex flex-col">

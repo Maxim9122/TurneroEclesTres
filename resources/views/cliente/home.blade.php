@@ -12,7 +12,7 @@
                     <div class="rounded-lg overflow-hidden border border-mate-borde" style="{{ $empresa->fondoCss() }}">
                         <div class="bg-black/15 flex flex-col items-center gap-1 p-3">
                             @if ($empresa->logo_path)
-                                <img src="{{ asset('storage/' . $empresa->logo_path) }}"
+                                <img loading="lazy" decoding="async" src="{{ asset('storage/' . $empresa->logo_path) }}"
                                     class="w-10 h-10 rounded-full object-cover bg-white shadow">
                             @else
                                 <div class="w-10 h-10 rounded-full bg-white/80"></div>

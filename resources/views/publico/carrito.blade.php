@@ -6,8 +6,6 @@
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
     <x-pwa-head />
     <title>Carrito - {{ $empresa->nombre }}</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css'])
 </head>
 <body class="min-h-screen bg-mate-fondo font-body flex flex-col">
@@ -26,7 +24,7 @@
             @foreach ($lineas as $linea)
                 <div class="bg-mate-superficie border border-mate-borde rounded-md p-3 flex items-center gap-3">
                     @if ($linea['producto']->foto_path)
-                        <img src="{{ asset('storage/' . $linea['producto']->foto_path) }}" class="w-12 h-12 rounded-md object-cover">
+                        <img loading="lazy" decoding="async" src="{{ asset('storage/' . $linea['producto']->foto_path) }}" class="w-12 h-12 rounded-md object-cover">
                     @else
                         <div class="w-12 h-12 rounded-md bg-mate-borde"></div>
                     @endif

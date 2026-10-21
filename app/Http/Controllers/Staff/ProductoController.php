@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Staff;
 
 use App\Http\Controllers\Controller;
+use App\Support\Imagenes;
 use App\Models\Producto;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -116,16 +117,7 @@ class ProductoController extends Controller
 
     private function guardarFotoPrincipal(Producto $producto, Request $request): void
     {
-        $carpeta = "productos/{$producto->id}";
-
-        foreach (Storage::disk('public')->files($carpeta) as $existente) {
-            if (str_starts_with(basename($existente), 'foto.')) {
-                Storage::disk('public')->delete($existente);
-            }
-        }
-
-        $extension = $request->file('foto')->getClientOriginalExtension();
-        $producto->foto_path = $request->file('foto')->storeAs($carpeta, "foto.{$extension}", 'public');
+        $producto->foto_path = Imagenes::guardar($request->file('foto'), "productos/{$producto->id}", 'foto', Imagenes::FOTO);
         $producto->save();
     }
 
@@ -144,8 +136,7 @@ class ProductoController extends Controller
         $espacioDisponible = max(0, 3 - $yaExistentes);
 
         foreach (array_slice($request->file('imagenes_adicionales'), 0, $espacioDisponible) as $index => $archivo) {
-            $nombre = uniqid('img_') . '.' . $archivo->getClientOriginalExtension();
-            $ruta = $archivo->storeAs($carpeta, $nombre, 'public');
+            $ruta = Imagenes::guardar($archivo, $carpeta, uniqid('img_'), Imagenes::FOTO, reemplazar: false);
 
             $producto->imagenes()->create([
                 'path' => $ruta,

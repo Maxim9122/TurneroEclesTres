@@ -6,8 +6,6 @@
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
     <x-pwa-head />
     <title>EclesTres - Turnos y productos cerca tuyo</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="min-h-screen bg-mate-fondo font-body">
@@ -87,7 +85,7 @@
                         <div class="w-20 shrink-0" style="{{ $empresa->fondoCss() }}">
                             <div class="h-full w-full bg-black/10 flex items-center justify-center p-2">
                                 @if ($empresa->logo_path)
-                                    <img src="{{ asset('storage/' . $empresa->logo_path) }}"
+                                    <img loading="lazy" decoding="async" src="{{ asset('storage/' . $empresa->logo_path) }}"
                                         class="w-10 h-10 rounded-full object-cover bg-white">
                                 @endif
                             </div>

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Staff;
 
 use App\Http\Controllers\Controller;
+use App\Support\Imagenes;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -31,14 +32,13 @@ class EmpresaBrandingController extends Controller
 
         $carpeta = "empresas/{$empresa->id}";
 
-        // Logo: siempre se guarda como "logo.{ext}", pisando el anterior.
+        // Logo y fondo: se guardan optimizados (WebP, achicados) y reemplazan la versión anterior.
         if ($request->hasFile('logo')) {
-            $this->reemplazarArchivo($empresa, 'logo_path', $request->file('logo'), $carpeta, 'logo');
+            $empresa->logo_path = Imagenes::guardar($request->file('logo'), $carpeta, 'logo', Imagenes::LOGO);
         }
 
-        // Imagen de fondo: siempre se guarda como "fondo.{ext}", pisando la anterior.
         if ($request->hasFile('imagen_fondo')) {
-            $this->reemplazarArchivo($empresa, 'imagen_fondo_path', $request->file('imagen_fondo'), $carpeta, 'fondo');
+            $empresa->imagen_fondo_path = Imagenes::guardar($request->file('imagen_fondo'), $carpeta, 'fondo', Imagenes::FONDO);
         }
 
         if ($request->boolean('quitar_imagen_fondo') && $empresa->imagen_fondo_path) {
@@ -53,25 +53,5 @@ class EmpresaBrandingController extends Controller
         $empresa->save();
 
         return back()->with('status', 'Los cambios se guardaron correctamente.');
-    }
-
-    /**
-     * Guarda el archivo con un nombre fijo (logo/fondo), pisando cualquier
-     * versión anterior -sea cual sea su extensión- para no acumular archivos.
-     */
-    private function reemplazarArchivo($empresa, string $campo, $archivo, string $carpeta, string $nombreBase): void
-    {
-        // Borra cualquier archivo previo con ese nombre base, sin importar la extensión
-        // (por si antes era .png y ahora suben un .webp, por ejemplo).
-        foreach (Storage::disk('public')->files($carpeta) as $existente) {
-            if (str_starts_with(basename($existente), $nombreBase . '.')) {
-                Storage::disk('public')->delete($existente);
-            }
-        }
-
-        $extension = $archivo->getClientOriginalExtension();
-        $rutaNueva = $archivo->storeAs($carpeta, "{$nombreBase}.{$extension}", 'public');
-
-        $empresa->{$campo} = $rutaNueva;
     }
 }

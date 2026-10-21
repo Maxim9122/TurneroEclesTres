@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Staff;
 
 use App\Http\Controllers\Controller;
+use App\Support\Imagenes;
 use App\Models\Servicio;
 use App\Models\ServicioImagen;
 use Illuminate\Http\RedirectResponse;
@@ -150,16 +151,7 @@ class ServicioController extends Controller
 
     private function guardarFotoPrincipal(Servicio $servicio, Request $request): void
     {
-        $carpeta = "servicios/{$servicio->id}";
-
-        foreach (Storage::disk('public')->files($carpeta) as $existente) {
-            if (str_starts_with(basename($existente), 'foto.')) {
-                Storage::disk('public')->delete($existente);
-            }
-        }
-
-        $extension = $request->file('foto')->getClientOriginalExtension();
-        $servicio->foto_path = $request->file('foto')->storeAs($carpeta, "foto.{$extension}", 'public');
+        $servicio->foto_path = Imagenes::guardar($request->file('foto'), "servicios/{$servicio->id}", 'foto', Imagenes::FOTO);
         $servicio->save();
     }
 
@@ -174,8 +166,7 @@ class ServicioController extends Controller
         $espacioDisponible = max(0, 3 - $yaExistentes);
 
         foreach (array_slice($request->file('imagenes_adicionales'), 0, $espacioDisponible) as $archivo) {
-            $nombre = uniqid('img_') . '.' . $archivo->getClientOriginalExtension();
-            $ruta = $archivo->storeAs($carpeta, $nombre, 'public');
+            $ruta = Imagenes::guardar($archivo, $carpeta, uniqid('img_'), Imagenes::FOTO, reemplazar: false);
 
             $servicio->imagenes()->create([
                 'path' => $ruta,

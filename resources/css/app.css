@@ -1,5 +1,11 @@
 @import "tailwindcss";
 
+/* Fuentes servidas desde el propio sitio (antes venían de Google Fonts y demoraban la primera visita) */
+@import "@fontsource/inter/latin-400.css";
+@import "@fontsource/inter/latin-500.css";
+@import "@fontsource/inter/latin-600.css";
+@import "@fontsource-variable/fraunces/opsz.css";
+
 @theme {
   --color-mate-fondo: #EDE7DD;
   --color-mate-tinta: #2E2B26;
@@ -9,8 +15,8 @@
   --color-mate-superficie: #F7F4EE;
   --color-mate-borde: #DDD5C7;
 
-  --font-display: "Fraunces", serif;
-  --font-body: "Inter", sans-serif;
+  --font-display: "Fraunces Variable", "Fraunces", Georgia, serif;
+  --font-body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 
 body {
