@@ -66,7 +66,7 @@
     <label class="block text-sm mb-1">Fotos adicionales (opcional, hasta 2 más)</label>
     <input type="file" name="imagenes_adicionales[]" accept="image/*" multiple
         class="w-full text-sm file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:bg-mate-salvia file:text-white text-mate-tinta/70">
-    <p class="text-xs text-mate-tinta/50 mt-1">El servicio puede tener hasta 3 fotos en total.</p>
+    <p class="text-xs text-mate-tinta/50 mt-1">El servicio puede tener hasta 3 fotos en total, de hasta 10 MB cada una (se achican solas).</p>
 
     @isset($servicio)
         @if ($servicio->imagenes->isNotEmpty())

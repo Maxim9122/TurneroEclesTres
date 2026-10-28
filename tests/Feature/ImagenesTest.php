@@ -85,6 +85,44 @@ class ImagenesTest extends TestCase
         Storage::disk('public')->assertExists($segundo);
     }
 
+    public function test_una_foto_de_celular_de_5_mb_se_acepta(): void
+    {
+        $servicio = Servicio::create(['empresa_id' => $this->empresa->id, 'nombre' => 'Maquillaje', 'duracion_minutos' => 90, 'precio' => 85000, 'activo' => true]);
+        $foto = UploadedFile::fake()->image('IMG_1234.jpg', 4000, 3000)->size(5000); // como una foto de iPhone
+
+        $this->actingAs($this->admin, 'web')->put(route('staff.empresa.servicios.update', $servicio), [
+            'nombre' => 'Maquillaje', 'duracion_minutos' => 90, 'precio' => 85000, 'foto' => $foto,
+        ])->assertSessionHasNoErrors();
+
+        $this->assertStringEndsWith('.webp', $servicio->fresh()->foto_path);
+    }
+
+    public function test_una_foto_de_mas_de_10_mb_se_rechaza_con_un_mensaje_claro(): void
+    {
+        $servicio = Servicio::create(['empresa_id' => $this->empresa->id, 'nombre' => 'Maquillaje', 'duracion_minutos' => 90, 'precio' => 85000, 'activo' => true]);
+
+        $this->actingAs($this->admin, 'web')->put(route('staff.empresa.servicios.update', $servicio), [
+            'nombre' => 'Maquillaje', 'duracion_minutos' => 90, 'precio' => 85000,
+            'foto' => UploadedFile::fake()->image('enorme.jpg')->size(11000),
+        ])->assertSessionHasErrors(['foto' => 'La foto no puede pesar más de 10 MB.']);
+    }
+
+    public function test_todas_las_validaciones_usadas_tienen_mensaje_en_espanol(): void
+    {
+        app()->setLocale('es');
+        $claves = [
+            'required', 'required_with', 'required_without', 'email', 'unique', 'confirmed', 'string', 'integer', 'numeric',
+            'decimal', 'array', 'in', 'boolean', 'date', 'date_format', 'after', 'after_or_equal', 'starts_with', 'url',
+            'image', 'mimes', 'file', 'uploaded', 'exists', 'regex',
+            'min.string', 'min.numeric', 'min.file', 'min.array', 'max.string', 'max.numeric', 'max.file', 'max.array',
+            'between.string', 'between.numeric', 'between.file', 'between.array',
+        ];
+
+        foreach ($claves as $clave) {
+            $this->assertNotSame("validation.{$clave}", __("validation.{$clave}"), "Falta el mensaje en español de '{$clave}'");
+        }
+    }
+
     public function test_un_logo_svg_se_guarda_tal_cual(): void
     {
         $svg = '<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10"><rect width="10" height="10"/></svg>';

@@ -24,8 +24,8 @@ class EmpresaBrandingController extends Controller
         $empresa = Auth::guard('web')->user()->empresa;
 
         $data = $request->validate([
-            'logo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,svg', 'max:2048'],
-            'imagen_fondo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
+            'logo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,svg', 'max:10240'],
+            'imagen_fondo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:10240'],
             'color_fondo' => ['nullable', 'regex:/^#[0-9A-Fa-f]{6}$/'],
             'quitar_imagen_fondo' => ['nullable', 'boolean'],
         ]);

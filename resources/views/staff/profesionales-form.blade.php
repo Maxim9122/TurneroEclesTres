@@ -15,7 +15,7 @@
 </div>
 
 <div>
-    <label class="block text-sm mb-1">Foto (opcional)</label>
+    <label class="block text-sm mb-1">Foto (opcional, hasta 10 MB)</label>
     <input type="file" name="foto" accept="image/*"
         class="w-full text-sm file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:bg-mate-salvia file:text-white text-mate-tinta/70">
     @isset($profesional)

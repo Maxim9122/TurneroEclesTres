@@ -88,7 +88,7 @@ class ProfesionalController extends Controller
     {
         return $request->validate([
             'nombre' => ['required', 'string', 'max:150'],
-            'foto' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'foto' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:10240'],
             'porcentaje_comision' => ['required', 'numeric', 'min:0', 'max:100'],
         ]);
     }

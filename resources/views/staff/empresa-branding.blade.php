@@ -38,7 +38,7 @@
                 <input type="file" name="logo" accept="image/*"
                     @change="logoPreview = URL.createObjectURL($event.target.files[0])"
                     class="w-full text-sm file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:bg-mate-salvia file:text-white text-mate-tinta/70">
-                <p class="text-xs text-mate-tinta/50 mt-1">JPG, PNG, WEBP o SVG. Máximo 2MB.</p>
+                <p class="text-xs text-mate-tinta/50 mt-1">JPG, PNG, WEBP o SVG. Hasta 10 MB (se achica solo).</p>
             </div>
 
             <div>
@@ -56,7 +56,7 @@
                     @change="fondoPreview = URL.createObjectURL($event.target.files[0])"
                     class="w-full text-sm file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:bg-mate-salvia file:text-white text-mate-tinta/70">
                 <p class="text-xs text-mate-tinta/50 mt-1">
-                    Si cargás una imagen, tiene prioridad sobre el color. Máximo 5MB.
+                    Si cargás una imagen, tiene prioridad sobre el color. Hasta 10 MB (se achica sola).
                 </p>
             </div>
 
