@@ -117,15 +117,16 @@ class TurnoController extends Controller
             return back()->withErrors(['servicios' => 'Elegí al menos un servicio.'])->withInput();
         }
 
+        $recortado = false;
+
         try {
-            DB::transaction(function () use ($turno, $data, $seleccion) {
+            DB::transaction(function () use ($turno, $data, $seleccion, &$recortado) {
                 // Lo que ya tenía el turno conserva su precio; solo lo nuevo toma el precio actual.
                 $seleccion->sincronizar($turno, $data['precios_adicionales'] ?? []);
 
                 $turno->refresh();
 
-                $duracionTotal = $turno->duracionTotalMinutos();
-                $horaFin = Carbon::parse($turno->hora_inicio)->addMinutes($duracionTotal)->format('H:i');
+                [$horaFin, $recortado] = Turno::calcularFin($turno->hora_inicio, $turno->duracionTotalMinutos());
 
                 if ($this->haySolapamiento($turno, $data['profesional_id'] ?? null, $turno->hora_inicio, $horaFin)) {
                     throw ValidationException::withMessages([
@@ -143,7 +144,8 @@ class TurnoController extends Controller
         }
 
         return redirect()->route('staff.empresa.turnos.index', ['fecha' => $turno->fecha->toDateString()])
-            ->with('status', 'Turno actualizado correctamente.');
+            ->with('status', 'Turno actualizado correctamente.'
+                . ($recortado ? ' Como no puede pasar al día siguiente, ahora termina a las 00:00.' : ''));
     }
 
     public function cambiarEstado(Request $request, Turno $turno): RedirectResponse

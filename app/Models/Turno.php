@@ -49,6 +49,38 @@ class Turno extends Model
             ->withTimestamps();
     }
 
+    /**
+     * Un turno nunca pasa al día siguiente: como mucho termina a medianoche (se guarda 23:59 y se
+     * muestra 00:00). Si pasara, quedaría por ejemplo 23:45–03:15 en el mismo día y se calcularían
+     * mal las superposiciones y los horarios libres.
+     */
+    public const FIN_DEL_DIA = '23:59';
+
+    /**
+     * Hora de fin de un turno que empieza a $inicio y dura $minutos, sin pasar de medianoche.
+     *
+     * @return array{0: string, 1: bool} [hora de fin "H:i", true si hubo que recortarlo]
+     */
+    public static function calcularFin(string $inicio, int $minutos): array
+    {
+        [$h, $m] = array_map('intval', explode(':', substr($inicio, 0, 5)));
+        $fin = $h * 60 + $m + max(0, $minutos);
+
+        if ($fin > 23 * 60 + 59) {
+            return [self::FIN_DEL_DIA, true];
+        }
+
+        return [sprintf('%02d:%02d', intdiv($fin, 60), $fin % 60), false];
+    }
+
+    /** "00:00" en vez de "23:59" para un turno que termina a medianoche. */
+    public function horaFinParaMostrar(): string
+    {
+        $fin = substr((string) $this->hora_fin, 0, 5);
+
+        return $fin === self::FIN_DEL_DIA ? '00:00' : $fin;
+    }
+
     /** Adicionales elegidos (diseño, líneas, etc.), con el precio y la duración del momento. */
     public function adicionales(): HasMany
     {

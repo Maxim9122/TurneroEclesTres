@@ -54,12 +54,14 @@ class TurnoRapidoController extends Controller
                 : back()->withErrors(['servicios' => $mensaje])->withInput();
         }
 
+        $recortado = false;
+
         try {
-            $turno = DB::transaction(function () use ($empresa, $data, $seleccion) {
+            $turno = DB::transaction(function () use ($empresa, $data, $seleccion, &$recortado) {
                 $ahora = Carbon::now();
-                $duracionTotal = $seleccion->duracionMinutos();
                 $horaInicio = $ahora->format('H:i');
-                $horaFin = $ahora->copy()->addMinutes($duracionTotal)->format('H:i');
+                // Si llega tarde y el servicio es largo, el turno termina a medianoche (no pasa al día siguiente).
+                [$horaFin, $recortado] = Turno::calcularFin($horaInicio, $seleccion->duracionMinutos());
 
                 if (!empty($data['profesional'])) {
                     $solapa = Turno::where('profesional_id', $data['profesional'])
@@ -105,12 +107,18 @@ class TurnoRapidoController extends Controller
             return back()->withErrors($e->errors())->withInput();
         }
 
+        $aviso = $recortado ? ' Como no puede pasar al día siguiente, quedó registrado hasta las 00:00.' : '';
+
         if ($request->wantsJson()) {
-            return response()->json(['ok' => true, 'mensaje' => 'Turno registrado para ' . $turno->cliente->nombre . '.']);
+            if ($recortado) {
+                // La ventana de la agenda recarga la página: el aviso se muestra al volver.
+                session()->flash('status', 'Turno registrado para ' . $turno->cliente->nombre . '.' . $aviso);
+            }
+            return response()->json(['ok' => true, 'mensaje' => 'Turno registrado para ' . $turno->cliente->nombre . '.' . $aviso]);
         }
 
         return redirect()->route('staff.empresa.turnos.index', ['fecha' => $turno->fecha->toDateString()])
-            ->with('status', 'Turno registrado para ' . $turno->cliente->nombre . ' (orden de llegada).');
+            ->with('status', 'Turno registrado para ' . $turno->cliente->nombre . ' (orden de llegada).' . $aviso);
     }
 
     private function crearClienteRapido(string $nombre, ?string $telefono): Cliente

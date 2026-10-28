@@ -20,7 +20,7 @@
 
             <div class="text-left text-sm space-y-1 bg-white border border-mate-borde rounded-md p-4 mb-6">
                 <p><strong>Fecha:</strong> {{ $turno->fecha->format('d/m/Y') }}</p>
-                <p><strong>Hora:</strong> {{ substr($turno->hora_inicio, 0, 5) }} a {{ substr($turno->hora_fin, 0, 5) }}</p>
+                <p><strong>Hora:</strong> {{ substr($turno->hora_inicio, 0, 5) }} a {{ $turno->horaFinParaMostrar() }}</p>
                 <p><strong>Servicios:</strong> {{ $turno->descripcionServicios() }}</p>
                 <p><strong>Profesional:</strong> {{ $turno->profesional->nombre ?? 'Sin preferencia (a asignar)' }}</p>
                 <p><strong>Total{{ $turno->adicionales->isNotEmpty() ? ' aproximado' : '' }}:</strong> ${{ number_format($turno->precioTotal(), 2, ',', '.') }}</p>

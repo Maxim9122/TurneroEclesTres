@@ -136,7 +136,7 @@
                 <div class="flex items-start justify-between gap-3 flex-wrap">
                     <div>
                         <p class="font-medium text-sm">
-                            #{{ $turno->id }} · {{ substr($turno->hora_inicio, 0, 5) }} - {{ substr($turno->hora_fin, 0, 5) }}
+                            #{{ $turno->id }} · {{ substr($turno->hora_inicio, 0, 5) }} - {{ $turno->horaFinParaMostrar() }}
                             · {{ $turno->cliente->nombre }}
                         </p>
                         <p class="text-xs text-mate-tinta/60 mt-0.5">

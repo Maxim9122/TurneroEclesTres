@@ -112,7 +112,7 @@ class ReservaController extends Controller
             return back()->withErrors(['hora' => 'Ese horario ya no está disponible. Elegí otro, por favor.']);
         }
 
-        $horaFin = Carbon::parse($data['hora'])->addMinutes($seleccion->duracionMinutos())->format('H:i');
+        [$horaFin] = Turno::calcularFin($data['hora'], $seleccion->duracionMinutos());
 
         $turno = DB::transaction(function () use ($empresa, $data, $fecha, $horaFin, $seleccion) {
             $turno = Turno::create([
